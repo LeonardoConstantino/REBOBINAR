@@ -1,0 +1,419 @@
+# REBOBINAR — Game Design Document (GDD) v1.0
+> Documento-fonte para agentes de desenvolvimento. Onde houver conflito entre este GDD e uma suposição própria, **este GDD vence**. Dúvidas: registrar em `docs/OPEN_QUESTIONS.md`, não improvisar.
+
+---
+
+## 0. Como usar este documento
+- Seções marcadas **[REQ]** são requisitos obrigatórios. **[TUNE]** são valores iniciais ajustáveis (devem viver em `content/*.ts`, nunca hardcoded). **[AC]** são critérios de aceitação.
+- Termos de domínio em português (Rebobinar, Retomada, Keyframe...) são **nomes oficiais**. Código usa inglês (`rewind`, `retake`, `keyframe`), mapeados na seção 14.
+
+---
+
+## 1. Visão
+**Pitch:** Platformer de corredor infinito onde cada morte rebobina o filme da run, devolvendo o jogador ao início, mais sábio.
+
+**Pilares (em ordem de prioridade):**
+1. **Fluxo acima de tudo.** Morrer e voltar a jogar precisa ser quase instantâneo.
+2. **Habilidade, não poder.** Nada que o jogador acumule o torna mais forte. Só ele melhora.
+3. **Metáfora de cinema em todo sistema.** Mecânica e tema não se divorciam.
+4. **Performance mobile é feature.** 60 fps estáveis em Android de entrada.
+5. **Determinismo e testabilidade.** A simulação é pura e testável em Node.
+
+**Tom:** nostálgico, elétrico (juice), fatalista-cômico.
+
+**Fora de escopo (v1):** ghost/Rastro de qualquer tipo, multiplayer, ranking online, boss fights, progressão de poder, monetização.
+
+---
+
+## 2. Plataforma e alvos
+| Item | Valor |
+|---|---|
+| Stack | Vite + TypeScript (strict) + Tailwind CSS + IndexedDB (`idb`) + Zustand (só UI) + Vitest |
+| Orientação | **Landscape** padrão. Portrait: tela de bloqueio "gire o aparelho". |
+| Mobile | PWA, fullscreen, offline-first |
+| Desktop | Teclado + Gamepad API |
+| Piso de hardware | Android 3 GB RAM, 60 fps alvo, degradação graciosa para 30 |
+| Resolução lógica | **640×360** unidades (16:9), tile = 16 u. Escala por `devicePixelRatio` com `image-smoothing` desligado. Letterbox em outras proporções. |
+
+---
+
+## 3. Arquitetura (resumo normativo)
+```
+src/
+├─ core/       loop, eventbus, scenes, config
+├─ sim/        PURO (sem DOM/Canvas/Date/Math.random). world, systems, gen, time
+├─ render/     renderer, camera, providers, filmfx
+├─ platform/   input/, storage/ (idb), audio/
+├─ ui/         DOM + Tailwind (menus, cartaz, cinemateca, pad visual)
+├─ content/    dados de armadilhas, inimigos, power-ups, modos, tuning
+└─ main.ts
+```
+**[REQ] Regra de dependência:** `sim` não importa `render`, `ui`, `platform`, `core`. Violação quebra o build (lint `eslint-plugin-boundaries` ou `dependency-cruiser` no CI).
+
+**[REQ] Loop:** timestep fixo 1/60, acumulador com clamp de 0,1 s, render interpolado por `alpha`. Pausa em `visibilitychange`.
+
+**[REQ] Estado da simulação:** Structure-of-Arrays em typed arrays, pools pré-alocados. **Zero alocação no hot path** (tick e draw). Estado reativo (Zustand) só para UI; a Sim se comunica com a UI por `EventBus` tipado com eventos discretos.
+
+**[REQ] Render:** interface `Drawable` / `DrawableProvider`. Hoje `ProceduralProvider`; futuro `AtlasProvider` (sprite sheet) **sem alterar Sim nem Renderer**.
+```ts
+interface Drawable { draw(ctx: CanvasRenderingContext2D, x: number, y: number, s: AnimState): void }
+interface DrawableProvider { get(kind: EntityKind, variant?: number): Drawable }
+```
+**[AC]** Trocar o provider por um stub que desenha retângulos não exige mudança fora de `render/`.
+
+---
+
+## 4. Loop de jogo
+
+### 4.1 Run
+1. Jogador nasce em 0 m num corredor que se estende infinitamente à direita.
+2. Avança, desvia de armadilhas e inimigos, coleta power-ups. **A câmera acompanha o jogador, sem autoscroll.** A pressão vem da Edição Final (4.3).
+3. Cruza **Keyframes** a cada 100 m (split automático).
+4. Morre → **Rebobinar** → nova run em 0 m.
+
+### 4.2 Morte e Rebobinar (feature central, ver seção 6)
+Não existe game over, só Rebobinar. Cada morte deixa uma **Marca de Tomada** no ponto exato (seção 7).
+
+### 4.3 A Edição Final — `pressure`
+Sinal escalar `pressure ∈ [0,1]` na Sim. Sem rosto, sem barra, sem timer visível.
+- Sobe com demora (jogador parado ou lento, `distance/time` abaixo de um piso que escala com a distância). Desce levemente ao cruzar Keyframes.
+- **Consumidores (somente leitura):** `FilmFX` (instabilidade do grão, tremor de borda, flicker), `AudioEngine` (projetor mais acelerado).
+- **[REQ]** `pressure` nunca causa dano. Só aumenta spawn de "Extras Rebeldes" em até +25% **[TUNE]** e intensidade visual.
+- **[AC]** `pressure` é função pura de `(tempoNaSeção, distância)`, testável em Vitest.
+
+### 4.4 Decisão central do jogador
+Risco (atalhos, velocidade, Fita Dourada) vs. segurança. Sem recompensa material, só fluxo e tempo de split.
+
+---
+
+## 5. Controles e Gamepad Virtual (mobile-first)
+
+### 5.1 Ações
+| Ação | Teclado | Gamepad | Toque |
+|---|---|---|---|
+| Mover (eixo X analógico) | A/D, ←/→ | Stick E / D-pad | Zona de deslize |
+| Pular | Espaço / W / ↑ | A | Botão Pulo |
+| Dash | Shift / K | X | Botão Dash |
+| Item (power-up armazenado) | J / E | Y | Botão Item |
+| Retomada | R | LB | Botão Retomada |
+| Pausa | Esc / P | Start | Ícone discreto no topo |
+
+Só existem **2 eixos de decisão** (X + pulo) e 3 ações secundárias. Plataforma sem eixo Y.
+
+### 5.2 Layout anatômico [REQ]
+- **Esquerda:** zona de deslize horizontal com **origem dinâmica** (o toque define a origem; arrasto define direção e intensidade). **Deadzone** 12 px com **histerese** (sai a 100%, retorna a 60%). Não é D-pad.
+- **Direita:** **Pulo** no ponto de repouso do polegar (maior alvo). Dash e Item em **arco** ao redor do pivô do polegar; Retomada no arco mais distante (menos frequente). Retomada exige alvo deliberado (evita toque acidental).
+- **Não cobrir a visão do jogo [REQ]:**
+  - O viewport lógico 16:9 é posicionado de forma que os controles ocupem as **margens laterais inferiores** (letterbox lateral quando houver espaço) e, onde não houver, sejam **semitransparentes (≤ 35% em repouso)**.
+  - Zona crítica de jogo (faixa central, ~60% da largura) é **livre de qualquer controle**.
+  - Visual do pad some quase por completo quando inativo, mantendo hitbox.
+- **Alvo físico mínimo ~9 mm** (calcular via `devicePixelRatio` e tamanho CSS). Hitbox em elipse maior que o visual.
+- **Multitouch:** Pointer Events; cada `pointerId` pertence a **uma zona** via `setPointerCapture`. Polegares nunca interferem entre si.
+- **Calibração (onboarding ~5 s):** jogador desenha o alcance do polegar; pad se posiciona e escala. Perfil salvo por orientação/dispositivo em IndexedDB. Opção de "refazer" nos ajustes.
+- CSS obrigatório: `touch-action: none`, `user-select: none`, `env(safe-area-inset-*)`. Animações do pad só com `transform`/`opacity`.
+- Háptico via `navigator.vibrate` onde existir; no iOS, compensar com feedback visual/sonoro.
+
+### 5.3 Camada de input unificada
+```ts
+export const enum Btn { Left=1, Right=2, Jump=4, Dash=8, Item=16, Retake=32 }
+interface InputFrame { buttons: number; axisX: number }   // -1..1
+interface InputSource { poll(out: InputFrame): void }
+// KeyboardSource | TouchPadSource | GamepadSource -> InputManager mescla
+```
+
+### 5.4 Game feel (implementado na **Sim**, não no pad) [REQ]
+- **Input buffer** de pulo: 100 ms [TUNE]
+- **Coyote time:** 90 ms [TUNE]
+- Pulo variável (soltar cedo corta a altura), gravidade maior na descida.
+- **[AC]** Testes unitários cobrem buffer e coyote com sequências de InputFrame.
+
+---
+
+## 6. Sistema de Tempo: Rebobinar, Retomada, Splits
+
+Três recursos distintos, **cada um com a estrutura de dados mais barata possível**. Não unificar em um único buffer genérico.
+
+### 6.1 Rebobinar (morte), custo mínimo
+**Conceito:** replay reverso visual do caminho percorrido, de volta a 0 m.
+
+**Implementação [REQ]:**
+- Durante a run, `TrailRecorder` grava apenas a **trilha do jogador** a ~15 Hz (a cada 4 ticks): `x, y` em `Int16` (unidades ×4 para subunidade), `animFrame` em `Uint8`. Buffer **append-only pré-alocado** (capacidade para 15 min ≈ 13 500 amostras ≈ 70 KB). Zero alocação.
+- Na morte, `RewindScene` executa um **scrub reverso da câmera** lendo a trilha de trás para frente, com **duração fixa independente da distância** (aceleração com ease-in/out; amostras puladas conforme necessário).
+- Durante o scrub: **só se desenham** chunks estáticos (já cacheados em `OffscreenCanvas`), o sprite do jogador na posição da trilha e o `FilmFX` de reversão (grão invertido, linhas de rebobinar, riscos verticais). **Inimigos, armadilhas e power-ups não são simulados nem desenhados** (ou aparecem congelados em baixa opacidade, a decidir no protótipo).
+- Ao terminar, `World.reset()` regenera chunks 0..N via função pura e a run recomeça. Chunks iniciais podem ser **pré-aquecidos durante o scrub** (aproveitar o tempo para gerar).
+- **Nenhuma cópia de estado do mundo** é feita para o Rebobinar.
+
+**Durações por modo [TUNE]:**
+| Modo | Duração do scrub | Fade |
+|---|---|---|
+| Corte do Estúdio | 900 ms | sim |
+| Corte do Diretor | 500 ms | curto |
+| Rolo Censurado | **0 ms (instantâneo)** | nenhum |
+
+- **[REQ]** Tocar na tela / apertar qualquer botão durante o scrub **pula** o restante (exceto nos primeiros 150 ms para evitar toque acidental). Opção "Rebobinar rápido" nos ajustes.
+- **[AC]** No Rolo Censurado, tempo morte→controle disponível ≤ 1 frame útil (≤ 33 ms). Scrub de 15 min de run tem o mesmo custo de CPU que o de 10 s.
+
+### 6.2 Retomada (rewind voluntário), único sistema que restaura a Sim
+**Conceito:** volta ~3 s no tempo sem penalidade de zerar.
+
+**Implementação [REQ]:**
+- `SnapshotRing`: ring buffer **pré-alocado** de snapshots **completos** do estado da Sim (typed arrays; `set()` = memcpy) a **10 Hz**, profundidade **5 s** = 50 snapshots. Alocado uma vez no boot.
+- Ao acionar, restaura o snapshot mais próximo ≤ (agora − 3 s) e concede **invulnerabilidade de 600 ms** [TUNE].
+- Custo por snapshot proporcional ao tamanho do estado **ativo** (só entidades vivas no entorno da câmera; chunks são regenerados por função pura, não copiados).
+- **Limites (para não esvaziar o peso da morte) [REQ]:**
+  - **Cargas:** começa com 1; ganha +1 a cada 3 Keyframes, máximo 2 **[TUNE]**.
+  - **Indisponível** no Rolo Censurado e durante a Fita Dourada.
+  - Cooldown de 5 s após o uso.
+- Efeito visual: mini-scrub de 250 ms (reusa o `FilmFX` de reversão).
+- **[AC]** Restaurar e re-simular 100 vezes a partir do mesmo snapshot com os mesmos inputs produz estados idênticos (teste de determinismo).
+
+### 6.3 Splits nos Keyframes
+- A cada **100 m** [TUNE] o jogador cruza um **Keyframe**: carimbo visual "CENA 047 — 00:02:13", split de tempo da run.
+- Persistência (seção 11): **melhor tempo por trecho** (`[100k, 100(k+1))`) e por modo.
+- Comparação mostrada no carimbo: **Δ vs. melhor tempo do trecho** (verde/vermelho), **sem ghost**, só número.
+- Recompensa de Keyframe: +carga de Retomada (6.2), alívio de `pressure`.
+- **[AC]** Splits são derivados de `(tick, distância)` e não dependem de nenhuma trilha gravada.
+
+---
+
+## 7. Marca de Tomada (substitui o Rastro/ghost)
+**Conceito:** o mundo guarda onde o jogador morreu, funcionando como **documentação visual**, não como entidade.
+
+### 7.1 Modelo de dados [REQ]
+- Mortes são **agregadas por balde de distância** (`bucket = floor(distanceX / 4m)`) **por modo** (`studio|director|censored`).
+- Chave **independe do conteúdo do chunk** (que pode variar com a adaptação). Só importa a posição horizontal.
+- Estrutura: `Map<bucket, { count: number, lastRun: number, cause: CauseId }>` (esparsa).
+- **[REQ]** Nunca um objeto por morte. Mortes repetidas no mesmo lugar **incrementam `count`**.
+- Teto: máximo de 5 000 baldes por modo; acima disso, os de menor `count` e mais antigos são descartados.
+
+### 7.2 Apresentação
+- Marca = **claquete rachada** estilizada (procedural) fixada no ponto da morte, com tamanho/opacidade que crescem com `log2(count)` até um limite.
+- `count > 1` exibe um contador **"Tomada ×N"** (fonte monoespaçada de rolo de filme).
+- **Densidade:** só desenham as marcas dentro da janela da câmera (culling). Se vários baldes adjacentes estiverem visíveis, **fundir visualmente** em um cluster com a soma.
+- A marca da **morte atual** tem destaque temporário (flash + "TOMADA ×N+1").
+- Marcas são **puramente visuais e informativas**, sem colisão e sem efeito mecânico.
+- Opção nos ajustes: "Marcas: Todas / Só as próximas / Desligadas".
+
+### 7.3 Uso pelo sistema adaptativo
+Ver 8.3: o histograma de baldes é a entrada permitida para adaptação.
+
+---
+
+## 8. Mundo procedural
+
+### 8.1 Gerador [REQ]
+Chunks são **função pura**:
+```ts
+type ChunkGenerator = (seed: number, index: number, params: DifficultyParams) => ChunkData
+```
+- PRNG com seed por chunk: `mulberry32(hash(seed, index))`. **Proibido** `Math.random` na `sim/`.
+- `ChunkData` é dado puro: tiles, spawns, triggers. Sem referências a render.
+- **Largura de chunk:** 32 tiles (512 u) [TUNE]. Janela ativa: chunk atual ± 2.
+- **Solvabilidade obrigatória:** após gerar, um `ChunkValidator` verifica atravessabilidade com os limites de pulo/dash do modo. Chunk inválido é regenerado com seed derivada (`index, attempt`) até N tentativas, depois cai em um template seguro.
+- Pool de chunks com cache LRU. Chunks estáticos pré-renderizados em `OffscreenCanvas`.
+
+### 8.2 Seed
+- Cada **perfil+modo** tem uma `corridorSeed` persistente: o "filme" é o mesmo entre runs, então as marcas de morte são significativas. Botão "Nova fita" gera nova seed e arquiva as marcas antigas na Cinemateca (somente leitura).
+
+### 8.3 Dificuldade e adaptação (Variação C, com limites)
+```ts
+interface DifficultyParams {
+  density: number; trapMix: TrapWeights; speedScale: number;
+  mode: 'studio'|'director'|'censored'; adaptation: AdaptationBias;
+}
+```
+- **Base:** curva por distância (`f(distance, mode)`), tabela na seção 9.
+- **Adaptação [REQ, com cercas]:**
+  - Entradas permitidas: histograma de mortes por **causa** e por **balde** (7.1), e tendência de movimento (ex.: % de tempo andando para direita sem pausa).
+  - Efeito: ajusta **pesos do `trapMix`** em no máximo **±15%** e nunca altera `density` em mais de **±10%** [TUNE].
+  - **Proibido:** gerar situação sem solução, punir o jogador "pelo que ele já sabe" além dos limites acima, mudar chunks já visíveis.
+  - Todo chunk **registra os `DifficultyParams` usados** (`runLog`), para auditoria e reprodução.
+- **[AC]** Para qualquer `(seed, index, params)` o chunk é idêntico em Node e no navegador; validador aprova 100% dos chunks gerados em fuzz de 100 000 índices por modo.
+
+---
+
+## 9. Modos: "Cortes do Diretor"
+| Parâmetro | Corte do Estúdio | Corte do Diretor | Rolo Censurado |
+|---|---|---|---|
+| Janela de erro (coyote/buffer) | 100 / 120 ms | 80 / 100 ms | 60 / 80 ms |
+| Densidade inicial (rel.) | 1,0 | 1,3 | 1,6 |
+| Crescimento por 100 m | +4% | +6% | +10% |
+| Padrões agressivos desde | 600 m | 200 m | 0 m |
+| Retomada | sim | sim | **não** |
+| Rebobinar | 900 ms c/ fade | 500 ms | **instantâneo, sem fade** |
+| Armadilhas exclusivas | não | não | **sim** (precisão frame-perfect) |
+Cada modo tem **save, marcas, splits e seed próprios**. Todos os valores em `content/modes.ts`.
+
+---
+
+## 10. Conteúdo
+
+### 10.1 Armadilhas "Erros de Edição" [REQ v1: todas as 4]
+| Id | Comportamento |
+|---|---|
+| `jump_cut` | Trecho de chão some por ~fração de segundo em ritmo fixo e legível, reaparece |
+| `freeze_frame` | Calmaria visual enganosa (tudo "pausa") antes de um disparo |
+| `film_scratch` | Marca visual que esconde obstáculo real; há risco decorativo falso |
+| `rewind_glitch` | Se o jogador ultrapassa uma velocidade-limite, o fundo "rebobina" e um perigo já passado reaparece atrás |
+**Regra de legibilidade:** toda armadilha tem **telegraph** consistente (som+visual) e o padrão é **aprendível**, nunca aleatório puro.
+
+### 10.2 Inimigos "Figurantes Fora de Controle"
+| Id | v1 | Comportamento |
+|---|---|---|
+| `rebel_extra` | ✅ | Patrulha previsível, formações que variam sutilmente |
+| `ghost_double` (Dublê Fantasma) | ✅ | Imita o **padrão de movimento recente do jogador** (buffer curto de 2 s, não um replay) |
+| `censor` | v1.1 | Cria obstáculos aéreos; tenta tirar o jogador do enquadramento |
+| `continuity_error` | v1.1 | Surge por erro específico registrado na run |
+> Nota: o Dublê Fantasma **não** reintroduz o Rastro. Imita só movimento recente, é um inimigo, não registro de tentativa.
+
+### 10.3 Power-ups "Ferramentas de Diretor"
+| Id | Efeito | Duração |
+|---|---|---|
+| `slow_cam` | Mundo a 60% de velocidade | 3 s |
+| `still_frame` | Congela um inimigo/armadilha mirado | 4 s |
+| `golden_tape` | Multiplica o ganho de progresso, **desativa Retomada**, risco/recompensa | 12 s |
+(Retomada **não** é power-up: é recurso de run, seção 6.2.)
+
+---
+
+## 11. Persistência (IndexedDB via `idb`)
+DB `rebobinar`, `version` incrementável com migrações explícitas.
+
+| Store | Chave | Conteúdo |
+|---|---|---|
+| `profile` | `'main'` | nome, selos desbloqueados, versão do schema |
+| `settings` | `'main'` | volume, FX nível, marcas, rebobinar rápido, calibração do pad por orientação |
+| `corridors` | `mode` | `corridorSeed`, runs totais, melhor distância, melhor tempo |
+| `deathMarks` | `[mode, bucket]` | `count`, `lastRun`, `cause` |
+| `splits` | `[mode, segment]` | melhor tempo do trecho |
+| `codex` | `entryId` | `firstSeenAt`, `encounters`, `deathsBy` |
+| `posters` | `autoId` | metadados + thumbnail `Blob` do Cartaz (máx. 50, FIFO) |
+- **[REQ]** Escritas **assíncronas fora do tick**: *write-behind* no fim da run e em `visibilitychange: hidden`, nunca durante o loop.
+- **[REQ]** Falha de IDB (modo privado, quota) **não quebra o jogo**: cai em memória e avisa discretamente.
+- **[AC]** Migração de v1→v2 simulada em teste com dados reais.
+
+---
+
+## 12. Meta-sistema: Cinemateca (identidade e documentação, **nunca poder**)
+**Regra de ouro [REQ]:** nada na Cinemateca altera física, dificuldade, janela de erro, spawn ou qualquer parâmetro da Sim. Verificável por teste: o `SimConfig` é idêntico para qualquer `profile`.
+
+| Módulo | O que é |
+|---|---|
+| **Acervo (codex)** | Entradas de armadilhas, inimigos e power-ups, desbloqueadas ao **encontrar/sobreviver/morrer** para elas. Texto cômico no tom do jogo + dica de leitura do padrão. Documentação que ensina, sem conceder vantagem. |
+| **Filmografia** | Histórico de runs: distância, tomadas, modo, data. Arquivo de Cartazes. Estatísticas globais. |
+| **Selos & Créditos** | Cosméticos por feitos documentais (ex.: "10 mortes no mesmo ponto" → selo *Teimoso*). Dão: molduras de Cartaz, estilos de título, paletas de grão de filme, skins de claquete das Marcas, nomes nos "créditos". **Nenhum** afeta jogabilidade. |
+| **Fitas Arquivadas** | Corredores antigos (seed + marcas) em modo leitura, para comparar a evolução. |
+- Desbloqueios são **por ação, não por grind**: sem moeda, sem loja, sem timers.
+
+---
+
+## 13. Cartaz do Filme (compartilhamento)
+- Gerado em canvas ao final da sessão ou de recorde; exportado por `toBlob` + **Web Share API** (fallback: download).
+- Conteúdo: título dinâmico engraçado, distância, tempo, **nº de tomadas** (mortes), selo do modo, "crítica" fake.
+- **Stats reais** (v1), sem edição pelo jogador (mantém autenticidade; sátira vem do texto gerado).
+- **Consumidor de eventos [REQ]:** escuta `RunEnded{stats, splits, deaths}` do `EventBus`; nenhum código do Cartaz vive em `sim/`.
+- Textos em `content/poster/*.ts`, selecionados por regras (faixas de mortes/distância) + PRNG com seed da sessão (sem `Math.random` global).
+
+---
+
+## 14. Mapa de nomes
+| Oficial (PT) | Código (EN) |
+|---|---|
+| Rebobinar | `rewind` / `RewindScene` / `TrailRecorder` |
+| Retomada | `retake` / `SnapshotRing` |
+| Keyframe | `keyframe` |
+| Marca de Tomada | `takeMark` / `DeathMarkStore` |
+| Edição Final | `finalCut` / `pressure` |
+| Cinemateca | `cinematheque` |
+| Cartaz | `poster` |
+
+---
+
+## 15. Arte e Áudio
+
+### 15.1 Visual (procedural nesta fase)
+- Estética película antiga: **grão** (3–4 tiles de ruído pré-gerados, alternados com offset aleatório, **nunca** ruído por frame), flicker sutil, vinheta, riscos.
+- **Degradação por distância:** função `era(distance) → { paleta, glitch }` (antigo p&b/sépia → saturado/digital/glitchado). Sem assets separados.
+- Parallax em `OffscreenCanvas` cacheado. Chunks estáticos pré-renderizados.
+- Personagem: desenhado por primitivas, com **animação por parâmetros** (squash & stretch). Preparado para atlas (`AnimState` desacoplado do desenho).
+
+### 15.2 FX tiers (degradação por hardware) [REQ]
+| Tier | Ativação | Efeitos |
+|---|---|---|
+| `high` | desktop / frame time < 10 ms | grão + flicker + vinheta + glitch + partículas completas |
+| `mid` | padrão mobile | grão + vinheta + partículas reduzidas |
+| `low` | frame time p95 > 14 ms por 3 s | sem grão animado, vinheta estática, partículas mínimas |
+Troca **automática e persistida**, com override manual.
+
+### 15.3 Áudio
+Web Audio nativo (ou Howler). Desbloqueio no 1º toque. Sons por evento do `EventBus`. Projetor/rolo acelera com `pressure`. Silêncio breve ao ultrapassar o próprio recorde (momento definidor).
+
+### 15.4 Juice [REQ]
+Toda ação tem resposta (som+partícula+squash). Screen shake **com intensidade configurável** e opção de reduzi-lo (acessibilidade).
+
+---
+
+## 16. Orçamentos de performance [REQ]
+| Métrica | Orçamento |
+|---|---|
+| Frame time (device alvo) | ≤ 16,6 ms; Sim ≤ 3 ms, Render ≤ 8 ms |
+| Alocações no tick/draw | **0** (verificar com Chrome DevTools allocation timeline) |
+| GC pauses no loop | nenhuma visível |
+| Memória total | ≤ 150 MB |
+| Draw calls por frame | ≤ 150; sprites por `batch` quando atlas existir |
+| Tamanho do bundle inicial | ≤ 350 KB gzip (JS) |
+| Tempo até jogável (4G, device alvo) | ≤ 3 s |
+Táticas esperadas: culling, pooling, caches `OffscreenCanvas`, `ctx.save/restore` mínimos, agrupar mudanças de estado do contexto, sem `shadowBlur`, sem `filter` em tela cheia, `desynchronized: true` quando suportado, e `Worker` + `OffscreenCanvas` para pré-geração de chunks se o perfil mostrar ganho (**medir antes**).
+
+---
+
+## 17. Acessibilidade e conforto
+- Modos de daltonismo para a leitura de perigos (forma além de cor).
+- Redução de flicker/tremor e aviso de fotossensibilidade na 1ª execução (o tema de filme usa flicker).
+- Escala do pad ajustável; modo canhoto (inverte zonas).
+- Todos os feedbacks de áudio têm equivalente visual.
+
+---
+
+## 18. Testes [REQ]
+- **Vitest (Node):** gerador (determinismo, fuzz de solvabilidade), `pressure`, buffer/coyote, `SnapshotRing` (restauração determinística), `TrailRecorder`, agregação de `DeathMarks`, regra "Cinemateca não afeta Sim".
+- **E2E leve (Playwright, viewport mobile landscape):** boot→jogar→morrer→rebobinar→jogar; pad multitouch simulado; persistência após reload.
+- **Perfil:** script de benchmark headless do tick (ticks/s) com limite regressivo no CI.
+
+---
+
+## 19. Roadmap e Definition of Done
+
+| Marco | Entregáveis | DoD |
+|---|---|---|
+| **M0 Fundação** | Vite+TS+Tailwind, lint de fronteiras, loop fixo, EventBus, CI | Quadrado procedural se move a 60 fps; boundaries verificados |
+| **M1 Núcleo jogável** | Física + game feel, `InputManager` (teclado/gamepad/toque), pad anatômico + calibração | Atravessar corredor plano no celular real sem cobrir a visão |
+| **M2 Mundo** | Gerador de chunks + validador + cache OffscreenCanvas + câmera | Fuzz verde; 60 fps com 5 chunks ativos |
+| **M3 Tempo** | `TrailRecorder` + Rebobinar (3 modos), `SnapshotRing` + Retomada, Keyframes/splits | Morte→controle conforme 6.1; teste de determinismo da Retomada |
+| **M4 Marcas** | `DeathMarkStore`, apresentação, agregação, culling | 1 000 mortes no mesmo balde = 1 registro; sem queda de fps |
+| **M5 Conteúdo** | 4 armadilhas, 2 inimigos, 3 power-ups, `pressure`, `FilmFX`, `era()` | Jogo completo em 3 modos, tiers de FX |
+| **M6 Meta** | IDB completo, Cinemateca, Cartaz, PWA offline, áudio | Funciona offline; migração testada |
+| **M7 Polimento** | Acessibilidade, balanceamento, benchmarks, device lab Android baixo | Todos os orçamentos da seção 16 cumpridos |
+
+**Definition of Done global:** TypeScript `strict` sem `any` não justificado; zero violações de fronteira; testes verdes; orçamentos medidos em dispositivo real de entrada; nenhum valor de balanceamento hardcoded fora de `content/`.
+
+---
+
+## 20. Riscos e mitigações
+| Risco | Mitigação |
+|---|---|
+| Adaptação gerar injustiça | Limites ±15%/±10%, validador de solvabilidade, `runLog` auditável |
+| Retomada banalizar a morte | Cargas limitadas, cooldown, indisponível no kaizo |
+| Pad cobrir a tela | Zona crítica livre, opacidade baixa em repouso, calibração |
+| Performance em celular fraco | FX tiers automáticos, orçamento de alocação zero, perfil contínuo |
+| Marcas poluírem a tela | Fusão por cluster, culling, opção de ocultar |
+| Fotossensibilidade | Aviso inicial + redução de flicker |
+| IDB indisponível | Fallback em memória sem quebrar o jogo |
+
+---
+
+## 21. Perguntas em aberto (resolver no protótipo, não bloquear)
+1. Inimigos/armadilhas durante o scrub do Rebobinar: ocultos ou congelados?
+2. O jogador deve poder pular o scrub no modo Estúdio sem "fricção de 150 ms"?
+3. Valores finais de física (gravidade, velocidade, altura de pulo) para o *feel*; começar de referência tipo Celeste/Super Meat Boy e ajustar por playtest.
+4. Tamanho ideal do balde de marcas (4 m) após testes de legibilidade.

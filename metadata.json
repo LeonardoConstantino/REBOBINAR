@@ -1,0 +1,7 @@
+{
+  "name": "REBOBINAR",
+  "description": "Platformer arcade de pós-produção cinematográfica com Rebobinar na morte, Retomada temporal e Marcas de Tomada.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

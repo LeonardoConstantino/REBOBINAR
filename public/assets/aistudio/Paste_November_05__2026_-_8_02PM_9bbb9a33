@@ -1,0 +1,1186 @@
+# REBOBINAR
+## Comentários ao GDD sob a perspectiva da Direção de Arte
+
+**Documento:** Direção de Arte — Análise e Recomendações  
+**Versão de referência:** GDD v1.0  
+**Projeto:** REBOBINAR  
+**Natureza:** Documento complementar de direção criativa  
+**Status:** Propostas conceituais — não substituem nem alteram automaticamente os requisitos do GDD.
+
+---
+
+# 1. Diagnóstico criativo
+
+REBOBINAR possui uma identidade conceitual bastante promissora: um jogo de plataforma infinito em que cada morte reinicia a jornada, mas o jogador retorna com mais conhecimento.
+
+O diferencial está na relação entre mecânica e linguagem cinematográfica. O jogo não utiliza apenas referências ao cinema como decoração: conceitos de edição, montagem, película, tomadas, cortes e rebobinamento já fazem parte de sua estrutura.
+
+Essa característica deve orientar toda a direção de arte.
+
+A proposta é transformar REBOBINAR em uma espécie de **arcade de pós-produção cinematográfica**, no qual o jogador não está apenas atravessando obstáculos: está participando de um filme que se degrada, se reorganiza e se repete.
+
+## Três direções criativas possíveis
+
+### Direção A — Cinemateca Clássica
+
+Uma abordagem baseada na estética de equipamentos analógicos, salas de projeção, películas antigas e arquivos cinematográficos.
+
+**Características:**
+- Paleta de preto, marfim, sépia e âmbar.
+- Texturas de película, poeira e riscos.
+- Tipografia editorial inspirada em cartazes e créditos de cinema.
+- Interface com aparência de equipamento de edição.
+- Animações mecânicas e precisas.
+
+**Vantagens:**
+- Identidade visual imediatamente reconhecível.
+- Forte coerência com a temática.
+- Boa possibilidade de construir uma marca consistente.
+
+**Riscos:**
+- Pode parecer excessivamente retrô.
+- Pode limitar a sensação de velocidade e energia.
+- Se aplicada literalmente, pode prejudicar a leitura dos obstáculos.
+
+### Direção B — Filme em Colapso
+
+Uma abordagem mais experimental, na qual a linguagem cinematográfica sofre interferências conforme a partida avança.
+
+**Características:**
+- Glitches, cortes abruptos e distorções.
+- Contrastes fortes entre imagem analógica e digital.
+- Cores progressivamente mais intensas.
+- Elementos visuais que parecem falhar ou sair de sincronização.
+- Interface que reage à pressão da partida.
+
+**Vantagens:**
+- Reforça a tensão e o caráter fatalista do jogo.
+- Dá personalidade ao sistema Final Cut.
+- Permite uma progressão visual perceptível.
+
+**Riscos:**
+- Excesso de efeitos pode comprometer a leitura.
+- Glitches constantes podem perder o impacto.
+- A identidade pode ficar visualmente cansativa.
+
+### Direção C — Arcade de Pós-Produção
+
+Uma direção híbrida que combina a linguagem analógica da Direção A com a energia e a degradação controlada da Direção B.
+
+**Características:**
+- Estrutura visual de equipamento cinematográfico.
+- Composição limpa e leitura imediata.
+- Efeitos de película usados como identidade, não como ruído permanente.
+- Cores de destaque para eventos importantes.
+- Interface editorial e funcional.
+- Degradação progressiva como recurso narrativo.
+
+**Vantagens:**
+- Preserva a legibilidade de um jogo arcade.
+- Explora a temática sem depender de referências superficiais.
+- Permite progressão visual sem exigir mudanças complexas de cenário.
+- Cria uma identidade que pode funcionar dentro e fora do jogo.
+
+**Risco principal:**
+- Exige controle rigoroso da quantidade de efeitos e da hierarquia visual.
+
+### Recomendação
+
+**Direção C — Arcade de Pós-Produção**, utilizando a Direção B como referência para os momentos de tensão.
+
+O jogo deve parecer uma experiência arcade construída dentro de uma ilha de edição cinematográfica. O visual analógico estabelece a identidade; os efeitos digitais e as falhas de imagem representam a pressão e a instabilidade.
+
+A estética não deve competir com a jogabilidade. O jogador precisa reconhecer um obstáculo, uma ameaça ou uma oportunidade antes de perceber a textura da película.
+
+---
+
+# 2. Manifesto visual
+
+A direção de arte de REBOBINAR deve seguir cinco princípios:
+
+1. **Tudo parece editável:** cortes, tomadas, marcas, transições e rebobinamentos devem possuir uma linguagem visual própria.
+2. **A jogabilidade vem primeiro:** efeitos nunca podem comprometer a leitura de obstáculos, personagens ou controles.
+3. **O passado deixa marcas:** mortes, recordes e tentativas anteriores devem construir uma memória visual.
+4. **A imagem acompanha a pressão:** quanto mais intensa a partida, mais instável pode parecer a apresentação.
+5. **O humor nasce da linguagem:** a comédia deve surgir de títulos, marcas de tomada, situações e elementos de produção cinematográfica.
+
+O objetivo é criar um jogo com personalidade visual mesmo quando todos os elementos são representados por formas simples.
+
+---
+
+# 3. Identidade visual e paleta cromática
+
+A paleta abaixo é uma proposta inicial de direção de arte. Não representa uma especificação já estabelecida no GDD.
+
+| Cor | Código | Aplicação sugerida |
+|---|---|---|
+| Preto de Sala | `#17191D` | Fundos e áreas de interface |
+| Marfim de Fotograma | `#E8DFC9` | Textos, elementos claros e referências à película |
+| Âmbar de Projetor | `#D69A45` | Destaques, recordes e elementos importantes |
+| Vermelho de REC | `#D94B43` | Alertas e eventos críticos |
+| Ciano de Monitor | `#42BFC2` | Elementos digitais e informações secundárias |
+| Violeta de Falha | `#8068B8` | Glitches e interferências |
+| Verde de Continuidade | `#91B66B` | Estados positivos e continuidade |
+
+## Recomendações de uso
+
+- O preto deve ser a base estrutural.
+- O marfim deve oferecer contraste sem recorrer ao branco puro em todos os elementos.
+- O âmbar deve ser reservado para elementos de importância.
+- O vermelho deve indicar situações de alerta, sem se tornar uma cor dominante.
+- O ciano e o violeta podem representar interferências digitais.
+- O verde deve ter uso semântico consistente.
+
+A cor nunca deve ser o único recurso para comunicar uma informação. Formas, ícones, padrões e animações devem complementar os códigos cromáticos.
+
+---
+
+# 4. Comentários sobre a visão geral do GDD
+
+## O que o GDD estabelece
+
+REBOBINAR é um jogo de plataforma infinito, com deslocamento contínuo para a direita. A morte reinicia a jornada, mas o jogador retorna com o conhecimento adquirido.
+
+Os pilares apresentados são:
+
+- Flow first.
+- Habilidade, não poder.
+- Metáfora cinematográfica em todos os sistemas.
+- Desempenho em dispositivos móveis.
+- Determinismo.
+
+O tom é nostálgico, elétrico e fatalista-cômico.
+
+## Interpretação da direção de arte
+
+A proposta deve equilibrar três sensações:
+
+- Nostalgia: aparência de película, projetor e equipamentos analógicos.
+- Eletricidade: velocidade, energia, impacto e movimento.
+- Fatalismo cômico: a repetição das falhas deve ser visualmente divertida, e não apenas punitiva.
+
+O conceito mais importante é que a morte não encerra a experiência. Ela representa uma nova montagem da mesma história.
+
+## Recomendação
+
+A identidade visual deve tratar cada partida como uma nova tomada de um filme que nunca termina.
+
+O jogador deve sentir que está dentro de um sistema de produção cinematográfica que perdeu o controle, mas continua funcionando.
+
+Evitar uma estética de terror ou de ficção científica genérica. A identidade deve permanecer próxima do universo de cinema, edição e arcade.
+
+---
+
+# 5. Comentários sobre plataforma e apresentação
+
+## O que o GDD estabelece
+
+- Orientação horizontal 16:9.
+- Prioridade para dispositivos móveis.
+- Resolução lógica de 640 × 360.
+- Público-alvo técnico inicial: dispositivos Android de entrada.
+- Meta de 60 FPS.
+
+## Interpretação da direção de arte
+
+A proporção 16:9 favorece uma composição semelhante à de um quadro cinematográfico.
+
+O espaço horizontal deve comunicar movimento e antecipação. O jogador precisa conseguir interpretar o que está à frente sem depender de elementos de interface.
+
+## Recomendação
+
+A composição deve trabalhar com três áreas:
+
+1. Área de ação: personagem, obstáculos e ameaças.
+2. Área de antecipação: espaço visual que permite identificar o que está por vir.
+3. Área de informação: elementos de interface e controles.
+
+O centro da tela deve permanecer o mais limpo possível.
+
+Texturas e efeitos devem ser projetados considerando a resolução lógica. Detalhes muito pequenos podem desaparecer ou produzir ruído visual em telas menores.
+
+---
+
+# 6. Comentários sobre arquitetura e estrutura da partida
+
+## O que o GDD estabelece
+
+A partida ocorre em um corredor infinito, com câmera acompanhando o jogador.
+
+Existem Keyframes a cada 100 metros. A morte provoca o rebobinamento e uma nova partida começa na posição inicial.
+
+## Interpretação da direção de arte
+
+O corredor precisa parecer infinito sem parecer visualmente repetitivo.
+
+A solução não depende necessariamente de criar muitos cenários diferentes. É possível construir variedade por meio de composição, iluminação, elementos de fundo e marcos visuais.
+
+## Recomendação
+
+Criar uma linguagem de cenário modular.
+
+Os elementos devem ser reconhecíveis mesmo quando combinados de maneiras diferentes.
+
+Sugestões:
+
+- Estruturas arquitetônicas simplificadas.
+- Elementos de iluminação que remetam a estúdios.
+- Molduras e divisões que lembrem fotogramas.
+- Marcas visuais de continuidade.
+- Objetos cenográficos recorrentes.
+
+Os Keyframes podem funcionar como pequenos pontos de referência visual, com uma identidade gráfica consistente.
+
+**Atenção:** os marcos visuais não devem se confundir com obstáculos ou elementos interativos.
+
+---
+
+# 7. Comentários sobre o loop e o Final Cut
+
+## O que o GDD estabelece
+
+O Final Cut funciona como um sinal de pressão.
+
+Ele não possui rosto, barra ou cronômetro. Sua presença é percebida pelo aumento dos efeitos de película e do áudio do projetor.
+
+Ele não causa dano diretamente, mas pode aumentar limitadamente a frequência de surgimento de obstáculos.
+
+## Interpretação da direção de arte
+
+A decisão de não utilizar uma barra de vida ou um cronômetro é interessante porque permite construir tensão de maneira sensorial.
+
+O jogador não precisa visualizar um número para perceber que a situação está ficando mais difícil.
+
+## Recomendação
+
+O Final Cut deve ser tratado como uma força invisível que está deteriorando a apresentação do filme.
+
+A progressão visual pode incluir:
+
+- Aumento gradual da intensidade dos riscos.
+- Maior presença de vinheta.
+- Pequenas instabilidades na imagem.
+- Alterações na iluminação.
+- Aumento da atividade visual de elementos periféricos.
+
+A progressão deve ser gradual e controlada.
+
+Não recomendo aplicar glitches intensos durante toda a partida. O efeito precisa ter valor dramático.
+
+**Ponto importante:** o aumento de efeitos não pode reduzir a visibilidade dos obstáculos ou produzir desconforto visual.
+
+---
+
+# 8. Comentários sobre controles e interface de toque
+
+## O que o GDD estabelece
+
+Os controles ficam nas margens inferiores laterais.
+
+A região central de 60% da tela deve permanecer livre. Os controles ficam quase invisíveis quando não estão em uso.
+
+## Interpretação da direção de arte
+
+A interface deve funcionar como uma camada discreta sobre a experiência.
+
+O jogador precisa perceber que os controles existem, mas não deve sentir que está jogando dentro de um painel de botões.
+
+## Recomendação
+
+Utilizar controles com aparência de marcações técnicas ou comandos de equipamento cinematográfico.
+
+Características sugeridas:
+
+- Ícones simples.
+- Contornos discretos.
+- Animação de resposta curta.
+- Realce durante o toque.
+- Contraste suficiente para acessibilidade.
+
+Os comandos devem ter linguagem visual consistente com os elementos de edição.
+
+A aparência quase invisível não pode comprometer a descoberta ou a utilização dos controles.
+
+---
+
+# 9. Comentários sobre os sistemas temporais
+
+## O que o GDD estabelece
+
+O jogo possui três conceitos temporais importantes:
+
+- Rebobinar após a morte.
+- Retomada voluntária de aproximadamente três segundos.
+- Keyframes que marcam divisões da jornada.
+
+## Interpretação da direção de arte
+
+Esses três sistemas precisam parecer diferentes, mesmo que compartilhem a mesma linguagem cinematográfica.
+
+O jogador deve compreender visualmente quando está:
+
+- Revendo uma falha.
+- Corrigindo uma decisão.
+- Registrando um marco da jornada.
+
+## Recomendação
+
+### Rebobinar
+
+Deve transmitir a sensação de que a película está sendo puxada para trás.
+
+Possibilidades visuais:
+
+- Reversão de animações.
+- Deslocamento de partículas em sentido contrário.
+- Pequena inversão de elementos visuais.
+- Redução ou reversão temporária da atividade sonora.
+
+### Retomada
+
+Deve parecer uma correção consciente de edição.
+
+A apresentação precisa ser mais precisa e controlada do que o rebobinamento após a morte.
+
+A diferença visual entre os dois sistemas deve ser clara.
+
+### Keyframes
+
+Devem funcionar como registros de uma tomada.
+
+Sugestões:
+
+- Pequena moldura de fotograma.
+- Identificação da distância.
+- Marca temporal.
+- Transição editorial discreta.
+
+A comparação entre tentativas deve ser visualmente clara, mas não ocupar espaço excessivo.
+
+---
+
+# 10. Comentários sobre a Marca de Tomada
+
+## O que o GDD estabelece
+
+A Marca de Tomada é uma claquete estilizada e rachada no ponto da morte.
+
+Ela cresce de acordo com a quantidade de mortes, seguindo uma progressão logarítmica.
+
+Exibe a informação “Tomada ×N”.
+
+Marcas próximas podem ser agrupadas. Elas não possuem colisão e servem apenas como informação visual.
+
+## Interpretação da direção de arte
+
+Esse é um dos elementos com maior potencial de personalidade do jogo.
+
+A marca transforma a repetição da morte em uma espécie de memória visual.
+
+Ela pode gerar humor e reforçar o conceito de que cada tentativa é mais uma tomada de uma produção interminável.
+
+## Recomendação
+
+A claquete deve possuir uma silhueta simples e reconhecível.
+
+A rachadura pode aumentar visualmente, mas a progressão precisa ser limitada para não comprometer a leitura.
+
+A tipografia deve parecer uma anotação de produção cinematográfica.
+
+O agrupamento de marcas deve manter a leitura da quantidade de tentativas.
+
+**Não recomendo** adicionar detalhes excessivos, como parafusos, letras pequenas ou texturas muito complexas. O elemento precisa funcionar em escala reduzida.
+
+---
+
+# 11. Comentários sobre o mundo procedural
+
+## O que o GDD estabelece
+
+O mundo é construído a partir de chunks com seed.
+
+A seed do corredor permanece consistente. Marcos visuais podem ser utilizados, mas a adaptação do mundo possui limites.
+
+## Interpretação da direção de arte
+
+O procedural não deve ser percebido como uma sequência aleatória de objetos.
+
+A composição precisa preservar uma identidade visual reconhecível.
+
+## Recomendação
+
+Criar famílias de elementos que possam ser recombinadas:
+
+- Estruturas.
+- Elementos de fundo.
+- Iluminação.
+- Decoração.
+- Marcas de continuidade.
+- Elementos cenográficos.
+
+Cada família deve respeitar uma linguagem de formas, proporções e materiais.
+
+Os marcos visuais podem funcionar como pontos de orientação e reconhecimento.
+
+A variedade deve surgir da combinação dos elementos, não da ausência de consistência.
+
+---
+
+# 12. Comentários sobre os modos de jogo
+
+## O que o GDD estabelece
+
+Existem três modos:
+
+- Corte do Estúdio.
+- Corte do Diretor.
+- Rolo Censurado.
+
+Eles possuem diferenças de dificuldade, disponibilidade de Retomada e duração do rebobinamento.
+
+O Rolo Censurado possui rebobinamento instantâneo, sem fade e sem Retomada.
+
+## Interpretação da direção de arte
+
+Os modos precisam ser visualmente identificáveis, mas não devem parecer três jogos diferentes.
+
+A linguagem central deve permanecer a mesma.
+
+## Recomendação
+
+Utilizar variações de apresentação, não identidades independentes.
+
+### Corte do Estúdio
+
+- Apresentação mais acessível.
+- Transições mais suaves.
+- Feedback visual mais explicativo.
+- Maior tolerância visual a erros.
+
+### Corte do Diretor
+
+- Apresentação mais intensa.
+- Transições mais rápidas.
+- Feedback mais direto.
+- Menos elementos de apoio.
+
+### Rolo Censurado
+
+- Linguagem mais abrupta.
+- Transições secas.
+- Cortes instantâneos.
+- Apresentação visual mais minimalista.
+
+O Rolo Censurado deve parecer uma edição deliberadamente agressiva, e não simplesmente uma versão com efeitos removidos.
+
+---
+
+# 13. Comentários sobre obstáculos e inimigos
+
+## O que o GDD estabelece
+
+Os obstáculos são chamados de Erros de Edição.
+
+Os inimigos são chamados de Figurantes Fora de Controle.
+
+Entre os elementos previstos estão:
+
+- `jump_cut`
+- `freeze_frame`
+- `film_scratch`
+- `rewind_glitch`
+- `rebel_extra`
+- `ghost_double`
+- `censor`
+- `continuity_error`
+
+## Interpretação da direção de arte
+
+A nomenclatura já apresenta uma direção conceitual forte.
+
+Os obstáculos devem parecer erros de montagem que ganharam forma física.
+
+Os inimigos devem parecer elementos da produção que deixaram de obedecer ao roteiro.
+
+## Recomendação
+
+Cada obstáculo deve possuir uma silhueta e uma linguagem de movimento próprias.
+
+### Jump Cut
+
+Representar uma interrupção abrupta da continuidade.
+
+A leitura visual deve sugerir um corte repentino.
+
+### Freeze Frame
+
+Utilizar a ideia de congelamento de imagem.
+
+O elemento deve comunicar imobilidade ou interrupção de movimento.
+
+### Film Scratch
+
+Explorar a estética de risco de película.
+
+O risco deve ser visualmente legível, sem se confundir com decoração de fundo.
+
+### Rewind Glitch
+
+Misturar sinais de retrocesso e falha digital.
+
+Deve ter uma linguagem visual diferente do rebobinamento geral.
+
+### Rebel Extra
+
+O personagem deve parecer um figurante que abandonou sua posição ou função.
+
+Sua silhueta e animação precisam comunicar comportamento imprevisível.
+
+### Ghost Double
+
+A ideia de duplicação deve ser evidente.
+
+Pode utilizar sobreposição, deslocamento e diferenças sutis de sincronização.
+
+### Censor
+
+A representação deve remeter à censura visual, sem depender de símbolos ofensivos ou de referências culturais específicas.
+
+### Continuity Error
+
+O conceito deve explorar contradições visuais de continuidade.
+
+Por exemplo, elementos que parecem não pertencer à mesma tomada.
+
+**Recomendação geral:** cada ameaça precisa ser reconhecível pela forma e pelo movimento, não apenas pela cor.
+
+---
+
+# 14. Comentários sobre as Ferramentas de Diretor
+
+## O que o GDD estabelece
+
+Os power-ups são chamados de Ferramentas de Diretor.
+
+Entre eles estão:
+
+- `slow_cam`
+- `still_frame`
+- `golden_tape`
+
+A Cinemateca não deve funcionar como progressão de poder.
+
+## Interpretação da direção de arte
+
+As ferramentas devem parecer objetos ou recursos de uma produção cinematográfica.
+
+A linguagem visual deve diferenciá-las dos obstáculos.
+
+## Recomendação
+
+### Slow Cam
+
+A apresentação deve sugerir desaceleração da imagem.
+
+### Still Frame
+
+Deve comunicar congelamento e controle do instante.
+
+### Golden Tape
+
+Pode utilizar o âmbar como destaque, reforçando a ideia de objeto especial ou registro valioso.
+
+A representação visual de cada ferramenta deve ser compreendida rapidamente durante a partida.
+
+Não recomendo transformar os itens em objetos excessivamente detalhados. A leitura em movimento é mais importante.
+
+---
+
+# 15. Comentários sobre persistência e progressão
+
+## O que o GDD estabelece
+
+O jogo não possui progressão de poder.
+
+A Cinemateca funciona como identidade, documentação, registro e coleção.
+
+Ela inclui códice, filmografia, selos, créditos e fitas arquivadas.
+
+Os elementos cosméticos não devem alterar o desempenho.
+
+## Interpretação da direção de arte
+
+A Cinemateca representa o arquivo de uma produção.
+
+Ela é o lugar onde o jogador encontra a memória de suas experiências.
+
+## Recomendação
+
+A interface deve se parecer com um arquivo cinematográfico.
+
+Possibilidades:
+
+- Pastas de produção.
+- Fichas técnicas.
+- Etiquetas de película.
+- Capas de fitas.
+- Registros de tomadas.
+- Créditos de produção.
+
+Cada categoria deve ter uma hierarquia visual própria.
+
+A coleção precisa parecer interessante mesmo sem oferecer vantagens mecânicas.
+
+---
+
+# 16. Comentários sobre a Cinemateca
+
+## O que o GDD estabelece
+
+A Cinemateca não é um sistema de poder.
+
+Ela documenta e organiza o conteúdo desbloqueado e os registros do jogador.
+
+## Interpretação da direção de arte
+
+A Cinemateca é uma oportunidade de aprofundar o universo do jogo sem criar novos sistemas de progressão.
+
+Ela pode funcionar como uma extensão da identidade visual.
+
+## Recomendação
+
+Tratar a Cinemateca como um arquivo de estúdio.
+
+A navegação deve ser editorial, com:
+
+- Categorias bem definidas.
+- Capas e miniaturas.
+- Identificação de registros.
+- Selos e créditos.
+- Estados de descoberta e conclusão.
+
+Evitar transformar a tela em uma interface de inventário genérica.
+
+O jogador deve sentir que está consultando o arquivo de uma produção cinematográfica.
+
+---
+
+# 17. Comentários sobre o Cartaz do Filme
+
+## O que o GDD estabelece
+
+O Cartaz do Filme é uma peça compartilhável.
+
+Ele apresenta:
+
+- Título dinâmico e humorístico.
+- Distância.
+- Tempo.
+- Quantidade de tomadas.
+- Selo do modo.
+- Crítica fictícia.
+
+As estatísticas devem ser reais.
+
+## Interpretação da direção de arte
+
+O cartaz é uma das principais oportunidades de levar a identidade de REBOBINAR para fora do jogo.
+
+Ele também pode funcionar como uma peça de divulgação espontânea.
+
+## Recomendação
+
+Criar um sistema de composição editorial com estrutura de pôster cinematográfico.
+
+Elementos sugeridos:
+
+- Título em destaque.
+- Imagem ou silhueta do personagem.
+- Estatísticas organizadas como créditos.
+- Selo do modo.
+- Crítica fictícia.
+- Identidade gráfica do jogo.
+
+A composição deve funcionar em diferentes proporções de compartilhamento.
+
+O título dinâmico deve ter prioridade visual, mas as estatísticas precisam continuar legíveis.
+
+A crítica fictícia pode explorar o humor fatalista do jogo.
+
+---
+
+# 18. Comentários sobre arte e áudio
+
+## O que o GDD estabelece
+
+A seção de arte e áudio prevê:
+
+- Arte procedural inicialmente.
+- Estética de filme antigo.
+- Granulação pré-gerada.
+- Flicker sutil.
+- Vinheta.
+- Riscos.
+- Degradação visual por distância.
+- Parallax.
+- Personagem construído com formas primitivas.
+- Squash and stretch.
+- Níveis de efeitos gráficos.
+- Áudio de projetor e rolo acelerando com a pressão.
+- Breve silêncio ao estabelecer um novo recorde.
+- Feedback sonoro para ações.
+- Tremor configurável.
+
+## Interpretação da direção de arte
+
+Essa seção já contém a base técnica e estética necessária para a identidade do projeto.
+
+O principal cuidado é evitar que a estética de filme antigo se torne uma camada genérica aplicada sobre todo o jogo.
+
+Os efeitos precisam ter função narrativa ou de feedback.
+
+## Recomendação visual
+
+### Granulação
+
+Deve ser discreta e consistente.
+
+### Flicker
+
+Deve ser controlado e configurável.
+
+### Vinheta
+
+Pode ajudar a direcionar a atenção, mas não deve escurecer áreas importantes.
+
+### Riscos
+
+Devem ser usados como linguagem de deterioração, e não como ruído permanente.
+
+### Parallax
+
+Deve reforçar a sensação de profundidade e velocidade.
+
+### Degradação por distância
+
+A mudança de preto e branco e sépia para cores saturadas e interferências digitais é uma ideia forte.
+
+Ela deve ser progressiva e perceptível, mas não abrupta a ponto de parecer uma troca aleatória de cenário.
+
+### Personagem
+
+A construção por formas primitivas combina com a proposta de produção visual simplificada.
+
+O personagem precisa ter uma silhueta reconhecível e uma animação expressiva.
+
+O squash and stretch deve reforçar peso, impacto, velocidade e humor.
+
+---
+
+# 19. Direção de personagens
+
+O GDD não define completamente a identidade física do protagonista. Portanto, esta seção apresenta princípios de direção, sem estabelecer espécie, gênero, idade ou características biográficas não documentadas.
+
+## Protagonista
+
+**Recomendação:** personagem compacto, expressivo e com silhueta facilmente reconhecível.
+
+A simplicidade visual deve ser uma escolha estética, não uma limitação aparente.
+
+Características desejáveis:
+
+- Silhueta clara.
+- Poucos detalhes internos.
+- Animações exageradas nos momentos de impacto.
+- Expressividade por postura e movimento.
+- Boa leitura em telas pequenas.
+
+O personagem deve parecer pertencer ao universo de produção cinematográfica de REBOBINAR, sem precisar necessariamente vestir uma fantasia literal de diretor.
+
+## Figurantes Fora de Controle
+
+### Rebel Extra
+
+Deve transmitir desobediência e imprevisibilidade.
+
+Sua animação pode sugerir que ele está ignorando a marcação de cena.
+
+### Ghost Double
+
+Deve explorar a ideia de duplicação e falta de sincronização.
+
+A silhueta deve permanecer reconhecível mesmo com sobreposição visual.
+
+## Diretriz geral
+
+Personagens e ameaças devem ser reconhecidos por forma, movimento e comportamento.
+
+A cor deve reforçar a identificação, nunca ser o único recurso.
+
+---
+
+# 20. Direção de interface e tipografia
+
+## Conceito
+
+A interface deve parecer uma mistura de equipamento de edição, ficha técnica e material editorial de cinema.
+
+Ela precisa ser funcional antes de ser decorativa.
+
+## Tipografia
+
+Recomendo trabalhar com duas famílias tipográficas:
+
+**Tipografia principal:**
+- Forte.
+- Legível.
+- Com personalidade editorial.
+- Utilizada em títulos e chamadas.
+
+**Tipografia secundária:**
+- Neutra.
+- Muito legível.
+- Adequada a números, estatísticas e informações técnicas.
+
+A interface não deve depender de fontes excessivamente estilizadas.
+
+## Linguagem textual
+
+Os textos devem explorar o vocabulário cinematográfico:
+
+- Tomada.
+- Corte.
+- Rebobinar.
+- Filmagem.
+- Continuidade.
+- Arquivo.
+- Crítica.
+- Produção.
+
+O humor deve aparecer em momentos específicos, especialmente nos registros de morte, nos cartazes e nos elementos da Cinemateca.
+
+---
+
+# 21. Direção de áudio
+
+## O que o GDD estabelece
+
+O áudio do projetor e do rolo acompanha a pressão.
+
+Existe um breve silêncio ao estabelecer um novo recorde.
+
+As ações possuem feedback sonoro.
+
+## Interpretação da direção de arte
+
+O som deve funcionar como extensão da linguagem visual.
+
+O jogador precisa sentir que está dentro de uma produção cinematográfica em funcionamento.
+
+## Recomendação
+
+### Camada ambiente
+
+Construir uma identidade sonora baseada em projetor, rolo, mecanismo e ruídos de produção.
+
+### Camada de ação
+
+Cada ação importante deve possuir uma resposta sonora curta e reconhecível.
+
+### Camada de pressão
+
+A intensidade do áudio deve acompanhar a evolução do Final Cut.
+
+### Camada de morte e rebobinamento
+
+O som deve reforçar a sensação de reversão e reinício.
+
+### Camada de recorde
+
+O breve silêncio previsto no GDD é uma escolha interessante.
+
+Ele cria contraste com a atividade sonora anterior e permite que o jogador reconheça a importância do momento.
+
+O GDD não determina BPM, instrumentação ou gênero musical. Esses elementos devem ser definidos posteriormente, após testes de ritmo e identidade.
+
+---
+
+# 22. Performance e orçamento visual
+
+## O que o GDD estabelece
+
+O jogo precisa funcionar em dispositivos Android de entrada, com meta de 60 FPS.
+
+Existem níveis de efeitos gráficos: alto, médio e baixo.
+
+## Interpretação da direção de arte
+
+A identidade visual não pode depender de efeitos caros ou de grande quantidade de elementos simultâneos.
+
+A estética precisa funcionar mesmo quando os recursos visuais são reduzidos.
+
+## Recomendação
+
+Priorizar:
+
+1. Silhuetas.
+2. Contraste.
+3. Animações essenciais.
+4. Feedback de ações.
+5. Efeitos de pressão.
+6. Texturas decorativas.
+
+Os efeitos devem ser tratados como camadas opcionais.
+
+A redução de qualidade gráfica não pode eliminar informações essenciais para a jogabilidade.
+
+A versão de menor qualidade deve continuar parecendo REBOBINAR.
+
+---
+
+# 23. Acessibilidade e conforto visual
+
+## O que o GDD estabelece
+
+O projeto prevê:
+
+- Modos para daltonismo.
+- Formas além de cores.
+- Redução de flicker.
+- Redução de tremor.
+- Aviso de fotossensibilidade.
+- Ajuste de tamanho dos controles.
+- Opção para canhotos.
+- Equivalentes visuais para feedbacks sonoros.
+
+## Interpretação da direção de arte
+
+A acessibilidade deve fazer parte da identidade visual desde o início.
+
+Não deve ser tratada como uma camada de correção adicionada ao final do projeto.
+
+## Recomendação
+
+### Daltonismo
+
+Combinar cores com formas, padrões, ícones e diferenças de movimento.
+
+### Flicker
+
+Permitir redução ou desativação dos efeitos de cintilação.
+
+### Tremor
+
+Manter a possibilidade de reduzir ou desativar movimentos de câmera.
+
+### Controles
+
+Garantir que os controles permaneçam identificáveis em diferentes escalas e posições.
+
+### Feedback sonoro
+
+Toda informação importante transmitida exclusivamente pelo som deve possuir uma alternativa visual.
+
+### Fotossensibilidade
+
+Evitar flashes intensos, alternâncias rápidas de alto contraste e padrões repetitivos agressivos.
+
+A identidade de película deve continuar reconhecível mesmo com efeitos reduzidos.
+
+---
+
+# 24. Comentários sobre o roadmap
+
+## O que o GDD estabelece
+
+O projeto está organizado em marcos M0 a M7.
+
+## Interpretação da direção de arte
+
+A direção de arte precisa acompanhar a evolução da experiência.
+
+Não é necessário produzir todos os elementos visuais finais desde o primeiro marco.
+
+Entretanto, a identidade central precisa ser estabelecida cedo para evitar retrabalho.
+
+## Recomendação
+
+### Primeiros marcos
+
+Definir:
+- Paleta.
+- Silhueta do protagonista.
+- Linguagem de obstáculos.
+- Aparência do corredor.
+- Tipografia básica.
+- Identidade dos efeitos de rebobinamento.
+
+### Marcos intermediários
+
+Refinar:
+- Identidade dos inimigos.
+- Interface.
+- Cinemateca.
+- Cartaz do Filme.
+- Variações visuais dos modos.
+
+### Marcos finais
+
+Validar:
+- Coerência visual.
+- Legibilidade em dispositivos móveis.
+- Performance dos efeitos.
+- Acessibilidade.
+- Consistência entre menus e gameplay.
+
+A produção visual deve evoluir junto com a validação das mecânicas.
+
+---
+
+# 25. Riscos e questões em aberto
+
+O GDD apresenta questões que merecem atenção da direção de arte.
+
+## Visibilidade dos inimigos durante o scrub
+
+É necessário definir como os inimigos aparecem durante a Retomada e o rebobinamento.
+
+A apresentação não pode criar confusão sobre o estado atual da partida.
+
+## Fricção para pular elementos
+
+A direção visual deve diferenciar claramente elementos interativos, elementos informativos e elementos decorativos.
+
+## Ajuste físico
+
+A escala dos personagens, obstáculos e controles precisa ser validada em telas reais.
+
+## Bucket de marcas de morte
+
+O agrupamento das marcas precisa preservar a identidade visual e a legibilidade das informações.
+
+## Outras questões recomendadas
+
+- Qual será a aparência definitiva do protagonista?
+- Qual é o grau de abstração dos cenários?
+- O corredor terá ambientes temáticos ou uma identidade única?
+- Qual será a intensidade máxima da degradação visual?
+- Como os modos serão identificados nos menus?
+- Como a Cinemateca apresentará conteúdo ainda não desbloqueado?
+- Qual será a linguagem visual dos recordes?
+- Como os efeitos serão adaptados ao modo de acessibilidade?
+
+Essas decisões devem ser tomadas antes da produção em larga escala dos assets.
+
+---
+
+# 26. Prioridades de produção da direção de arte
+
+Para evitar desperdício de esforço, recomendo a seguinte ordem:
+
+| Prioridade | Elemento | Objetivo |
+|---|---|---|
+| 1 | Protagonista | Estabelecer a identidade do jogo |
+| 2 | Corredor | Definir a linguagem do mundo |
+| 3 | Obstáculos | Garantir leitura imediata |
+| 4 | Animações | Dar personalidade e feedback |
+| 5 | Rebobinamento | Materializar o conceito central |
+| 6 | Final Cut | Construir progressão visual de tensão |
+| 7 | Interface | Organizar informação e controles |
+| 8 | Inimigos | Expandir a identidade dos desafios |
+| 9 | Cinemateca | Construir a camada de memória |
+| 10 | Cartaz do Filme | Expandir a identidade para compartilhamento |
+
+## Critério de aprovação visual
+
+Um elemento deve ser aprovado quando:
+
+- É reconhecível em tamanho reduzido.
+- Possui contraste suficiente.
+- Não prejudica a leitura da ação.
+- Pertence à linguagem visual do jogo.
+- Funciona em diferentes níveis de qualidade gráfica.
+- Não depende exclusivamente de cor.
+- Possui uma função clara na experiência.
+
+---
+
+# 27. Checklist de aprovação da direção de arte
+
+Antes de aprovar qualquer elemento visual, verificar:
+
+- [ ] O elemento combina com o universo cinematográfico de REBOBINAR?
+- [ ] Sua função é compreendida rapidamente?
+- [ ] A silhueta é reconhecível?
+- [ ] A leitura funciona em tela pequena?
+- [ ] O elemento mantém contraste suficiente?
+- [ ] Ele pode ser confundido com um obstáculo ou informação importante?
+- [ ] O efeito visual possui uma função clara?
+- [ ] A animação reforça o comportamento do elemento?
+- [ ] O elemento respeita as opções de acessibilidade?
+- [ ] O elemento funciona nos níveis gráficos reduzidos?
+- [ ] A estética está coerente com os demais sistemas?
+
+---
+
+# 28. Autocrítica da direção criativa
+
+A proposta de Arcade de Pós-Produção é coerente com o conceito do jogo, mas também apresenta riscos.
+
+## Risco de excesso temático
+
+A utilização constante de claquetes, películas, projetores, cortes e referências cinematográficas pode deixar o universo previsível.
+
+**Correção:** utilizar a linguagem cinematográfica como estrutura visual, não como uma coleção de símbolos literais.
+
+## Risco de excesso de efeitos
+
+A degradação visual pode competir com os obstáculos e prejudicar a jogabilidade.
+
+**Correção:** estabelecer uma hierarquia de efeitos e limitar a intensidade em situações de maior exigência de leitura.
+
+## Risco de identidade retrô genérica
+
+A estética de filme antigo é bastante conhecida e pode parecer pouco original quando aplicada sem uma ideia central.
+
+**Correção:** explorar a relação entre montagem, repetição, erro e memória. Essa combinação é mais particular de REBOBINAR do que a simples utilização de filtros de película.
+
+## Risco de simplificação excessiva
+
+O uso de formas primitivas pode gerar personagens sem personalidade.
+
+**Correção:** investir em silhueta, ritmo de animação, squash and stretch e comportamento.
+
+## Risco de inconsistência entre gameplay e menus
+
+Uma identidade visual forte durante a partida pode se perder em menus genéricos.
+
+**Correção:** utilizar a mesma linguagem editorial, tipográfica e cromática em todos os ambientes do jogo.
+
+---
+
+# 29. Conclusão
+
+REBOBINAR tem uma oportunidade clara de construir uma identidade visual própria a partir de sua mecânica central.
+
+O jogo não precisa parecer apenas um jogo de plataforma com filtros de filme antigo.
+
+Ele pode parecer uma experiência arcade que acontece dentro de uma produção cinematográfica em colapso.
+
+A direção recomendada é **Arcade de Pós-Produção**:
+
+- A estética analógica estabelece a identidade.
+- A linguagem arcade garante clareza e velocidade.
+- A degradação digital representa a pressão.
+- A repetição das tomadas constrói memória.
+- O humor transforma a falha em parte da personalidade do jogo.
+
+A maior força criativa do projeto está na coerência entre o que o jogador faz e o que o jogo representa.
+
+**O jogador não está simplesmente morrendo e recomeçando. Ele está gravando outra tomada.**
+
+Essa deve ser a ideia que orienta a direção de arte de REBOBINAR.
+
+---
+
+*Documento complementar ao GDD REBOBINAR v1.0. As recomendações deste documento são propostas de direção criativa e devem ser validadas com o desenvolvimento, os testes de jogabilidade e as restrições de produção.*

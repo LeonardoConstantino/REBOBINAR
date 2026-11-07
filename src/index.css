@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --cinema-black: #17191D;
+    --cinema-ivory: #E8DFC9;
+    --cinema-amber: #D69A45;
+    --cinema-rec: #D94B43;
+    --cinema-cyan: #42BFC2;
+    --cinema-violet: #8068B8;
+    --cinema-green: #91B66B;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--cinema-black);
+    color: var(--cinema-ivory);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+.font-display {
+  font-family: 'Bebas Neue', cursive, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.font-mono-film {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Film scanlines / vignette overlay in pure CSS where needed */
+.film-grain-overlay {
+  background-image: radial-gradient(circle at center, transparent 40%, rgba(23, 25, 29, 0.75) 100%);
+  pointer-events: none;
+}
