@@ -1,10 +1,12 @@
 import React from 'react';
 import { useGameStore } from '../store';
 import { audioEngine } from '../../platform/audio/audioEngine';
-import { X, Volume2, Monitor, Eye, Sliders, ShieldCheck } from 'lucide-react';
+import { useFullscreen } from '../../platform/fullscreen';
+import { X, Volume2, Monitor, Eye, Sliders, ShieldCheck, Maximize, Minimize } from 'lucide-react';
 
 export const SettingsModal: React.FC = () => {
   const { activeModal, closeModal, settings, updateSettings } = useGameStore();
+  const { isFullscreen, supported: fsSupported, toggle: toggleFs } = useFullscreen();
 
   if (activeModal !== 'settings') return null;
 
@@ -18,7 +20,7 @@ export const SettingsModal: React.FC = () => {
               AJUSTES DE PROJEÇÃO
             </h2>
             <p className="text-[11px] font-mono-film text-[#E8DFC9]/60">
-              CONFIGURAÇÃO DE GRÃO, ÁUDIO E CONTROLES
+              CONFIGURAÇÃO DE TELA, GRÃO, ÁUDIO E CONTROLES
             </p>
           </div>
           <button
@@ -31,6 +33,35 @@ export const SettingsModal: React.FC = () => {
 
         {/* Settings Body */}
         <div className="p-5 overflow-y-auto space-y-5">
+          {/* Fullscreen Mode */}
+          {fsSupported && (
+            <div className="flex items-center justify-between p-3 bg-[#1D2127] border border-[#E8DFC9]/20 rounded-sm">
+              <div>
+                <div className="font-mono-film text-xs font-bold text-[#E8DFC9] flex items-center gap-1.5">
+                  {isFullscreen ? (
+                    <Minimize className="w-4 h-4 text-[#D69A45]" />
+                  ) : (
+                    <Maximize className="w-4 h-4 text-[#D69A45]" />
+                  )}
+                  MODO TELA CHEIA (FULLSCREEN)
+                </div>
+                <p className="text-[11px] text-[#E8DFC9]/60 mt-0.5">
+                  Oculta a barra de endereços no mobile e preenche todo o display.
+                </p>
+              </div>
+              <button
+                onClick={toggleFs}
+                className={`py-1.5 px-3 rounded text-xs font-mono-film font-bold border cursor-pointer transition-colors ${
+                  isFullscreen
+                    ? 'bg-[#D69A45] text-[#17191D] border-[#D69A45]'
+                    : 'bg-[#2A2E35] text-[#E8DFC9] border-[#E8DFC9]/30 hover:border-[#D69A45]'
+                }`}
+              >
+                {isFullscreen ? 'ATIVO (SAIR)' : 'ATIVAR'}
+              </button>
+            </div>
+          )}
+
           {/* Audio Volume */}
           <div>
             <div className="flex items-center justify-between mb-1.5">

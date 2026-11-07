@@ -1,7 +1,8 @@
 import React from 'react';
 import { useGameStore } from '../store';
 import { MODES } from '../../content/modes';
-import { Film, Image as ImageIcon, Settings, Pause, Rewind, Zap, Play } from 'lucide-react';
+import { useFullscreen } from '../../platform/fullscreen';
+import { Film, Image as ImageIcon, Settings, Pause, Rewind, Zap, Play, Maximize, Minimize } from 'lucide-react';
 
 interface HUDProps {
   onTogglePause: () => void;
@@ -23,6 +24,7 @@ export const HUD: React.FC<HUDProps> = ({ onTogglePause, isPaused }) => {
     openModal,
   } = useGameStore();
 
+  const { isFullscreen, supported: fsSupported, toggle: toggleFs } = useFullscreen();
   const modeConfig = MODES[mode];
 
   return (
@@ -129,6 +131,21 @@ export const HUD: React.FC<HUDProps> = ({ onTogglePause, isPaused }) => {
           >
             <ImageIcon className="w-4 h-4" />
           </button>
+
+          {/* Fullscreen Button */}
+          {fsSupported && (
+            <button
+              onClick={toggleFs}
+              title={isFullscreen ? 'Sair da Tela Cheia' : 'Tela Cheia'}
+              className="p-1.5 bg-[#17191D]/85 border border-[#E8DFC9]/20 hover:border-[#D69A45] text-[#E8DFC9] rounded-sm transition-colors cursor-pointer"
+            >
+              {isFullscreen ? (
+                <Minimize className="w-4 h-4 text-[#D69A45]" />
+              ) : (
+                <Maximize className="w-4 h-4" />
+              )}
+            </button>
+          )}
 
           <button
             onClick={() => openModal('settings')}
