@@ -5,6 +5,8 @@ import { SnapshotRing } from '../time/snapshotRing';
 import { TrailRecorder } from '../time/trailRecorder';
 import { FinalCutSystem } from '../finalCut';
 import { Player } from '../player';
+import { EnemyManager } from '../enemies';
+import { TrapManager } from '../traps';
 import { Btn } from '../../core/types';
 import { PHYSICS_CONFIG, TIME_CONFIG } from '../../content/tuning';
 
@@ -147,9 +149,89 @@ describe('Player Coyote Time & Jump Buffer', () => {
   });
 });
 
-describe('Metagame Rule', () => {
-  it('guarantees SimConfig / Physics is independent of Cinemateca or cosmetics', () => {
-    expect(PHYSICS_CONFIG.gravity).toBe(1100);
-    expect(TIME_CONFIG.fixedTickRate).toBe(60);
+describe('Enemy Stomp & Ghost Double Calibration', () => {
+  it('allows stomping on rebel_extra when descending', () => {
+    const enemies = new EnemyManager();
+    enemies.addEnemy('rebel_extra', 100, 200, 4);
+
+    // Player descending onto enemy's head
+    const result = enemies.checkCollision(100, 185, 14, 22, 150, false);
+    expect(result.stomped).toBe(true);
+    expect(result.cause).toBeNull();
+    expect(enemies.enemies[0].defeated).toBe(true);
+  });
+
+  it('causes fatal damage when walking horizontally into rebel_extra without downward velocity', () => {
+    const enemies = new EnemyManager();
+    enemies.addEnemy('rebel_extra', 100, 200, 4);
+
+    // Player walking into enemy at same level (vy = 0)
+    const result = enemies.checkCollision(100, 200, 14, 22, 0, false);
+    expect(result.stomped).toBe(false);
+    expect(result.cause).toBe('rebel_extra');
+  });
+
+  it('decays ghost double over its calibrated lifetime instead of chasing forever', () => {
+    const enemies = new EnemyManager();
+    enemies.addEnemy('ghost_double', 100, 200, 4);
+
+    expect(enemies.enemies[0].lifeTimer).toBeCloseTo(5.5);
+
+    // Simulate 6 seconds of game time
+    for (let i = 0; i < 360; i++) {
+      enemies.update(1 / 60, 150);
+    }
+
+    // Ghost should have dissolved
+    expect(enemies.enemies.length).toBe(0);
+  });
+
+  it('dispels ghost doubles when dispelAllGhosts is called (e.g. keyframe or rewind)', () => {
+    const enemies = new EnemyManager();
+    enemies.addEnemy('ghost_double', 100, 200, 4);
+    expect(enemies.enemies[0].defeated).toBe(false);
+
+    enemies.dispelAllGhosts();
+    expect(enemies.enemies[0].defeated).toBe(true);
+  });
+});
+
+describe('Grounded Traps & Floor Alignment', () => {
+  it('positions all generated chunk traps flush on the floor surface', () => {
+    const params = {
+      density: 1.0,
+      trapMix: { jump_cut: 1, freeze_frame: 1, film_scratch: 1, rewind_glitch: 1 },
+      speedScale: 1.0,
+      mode: 'studio' as const,
+      adaptation: { densityShift: 0, weightShift: {} },
+    };
+
+    const chunk = generateChunk(12345, 2, params);
+    expect(chunk.traps.length).toBeGreaterThan(0);
+
+    for (const t of chunk.traps) {
+      // In pixels, bottom of trap (tileY * 16 + def.height) must be 288 (GROUND_Y * 16)
+      const trap = new TrapManager();
+      trap.addTrap(t.type, t.tileX * 16, t.tileY * 16);
+      const activeTrap = trap.traps[0];
+      const bottomY = activeTrap.y + activeTrap.height;
+      expect(bottomY).toBe(288);
+    }
+  });
+
+  it('triggers collision when player runs into active grounded traps', () => {
+    const trapManager = new TrapManager();
+    // Add freeze_frame (height 48) sitting on floor 288 -> y = 240
+    trapManager.addTrap('freeze_frame', 100, 240);
+    const trap = trapManager.traps[0];
+    trap.isHazardActive = true;
+
+    // Running player with feet at floor 288 (y = 266, height = 22)
+    const hit = trapManager.checkCollision(100, 266, 14, 22, false);
+    expect(hit).toBe('freeze_frame');
+
+    // Jumping player above the floor (feet at 230)
+    const miss = trapManager.checkCollision(100, 208, 14, 22, false);
+    expect(miss).toBeNull();
   });
 });

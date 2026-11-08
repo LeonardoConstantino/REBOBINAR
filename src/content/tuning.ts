@@ -43,9 +43,9 @@ export const TIME_CONFIG = {
   retakeRewindSeconds: 3.0,
   retakeInvulnSeconds: 0.6,
   retakeCooldownSeconds: 5.0,
-  retakeInitialCharges: 1,
+  retakeInitialCharges: 2,
   retakeKeyframesPerCharge: 3,
-  retakeMaxCharges: 2,
+  retakeMaxCharges: 3,
 };
 
 export const PRESSURE_CONFIG = {

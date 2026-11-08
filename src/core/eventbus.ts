@@ -4,6 +4,7 @@ export type GameEventMap = {
   'player:jump': { x: number; y: number };
   'player:dash': { x: number; y: number };
   'player:land': { x: number; y: number; velocity: number };
+  'player:stomp': { x: number; y: number };
   'player:damaged': { cause: CauseId; x: number; y: number };
   'player:died': { cause: CauseId; x: number; y: number; bucket: number; stats: RunStats };
   'player:retake': { x: number; y: number; charges: number };

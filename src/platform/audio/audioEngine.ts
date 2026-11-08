@@ -80,6 +80,7 @@ export class AudioEngine {
     eventBus.on('player:jump', () => this.playJump());
     eventBus.on('player:dash', () => this.playDash());
     eventBus.on('player:land', () => this.playLand());
+    eventBus.on('player:stomp', () => this.playFilmGateSnap());
     eventBus.on('player:died', () => this.playDeath());
     eventBus.on('player:retake', () => this.playRetake());
     eventBus.on('rewind:started', () => this.playRewindWhoosh());

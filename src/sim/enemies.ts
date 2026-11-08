@@ -13,6 +13,14 @@ export interface ActiveEnemy {
   facingRight: boolean;
   frozenTimer: number;
   animTimer: number;
+  lifeTimer: number;
+  defeated: boolean;
+  defeatedTimer: number;
+}
+
+export interface EnemyCollisionResult {
+  cause: CauseId | null;
+  stomped: boolean;
 }
 
 export class EnemyManager {
@@ -27,6 +35,15 @@ export class EnemyManager {
     this.enemies = [];
     this.historyCount = 0;
     this.historyIndex = 0;
+  }
+
+  dispelAllGhosts(): void {
+    for (const enemy of this.enemies) {
+      if (enemy.type === 'ghost_double' && !enemy.defeated) {
+        enemy.defeated = true;
+        enemy.defeatedTimer = 0.25;
+      }
+    }
   }
 
   recordPlayerPosition(px: number, py: number): void {
@@ -51,6 +68,10 @@ export class EnemyManager {
       facingRight: true,
       frozenTimer: 0,
       animTimer: 0,
+      // Fair tuning: Ghost Double now has an optical decay lifetime (5.5s) instead of chasing forever
+      lifeTimer: type === 'ghost_double' ? 5.5 : Infinity,
+      defeated: false,
+      defeatedTimer: 0,
     });
   }
 
@@ -60,8 +81,18 @@ export class EnemyManager {
     }
   }
 
-  update(dt: number): void {
-    for (const enemy of this.enemies) {
+  update(dt: number, playerX?: number): void {
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const enemy = this.enemies[i];
+
+      if (enemy.defeated) {
+        enemy.defeatedTimer -= dt;
+        if (enemy.defeatedTimer <= 0) {
+          this.enemies.splice(i, 1);
+        }
+        continue;
+      }
+
       if (enemy.frozenTimer > 0) {
         enemy.frozenTimer -= dt;
         continue;
@@ -80,6 +111,21 @@ export class EnemyManager {
           enemy.facingRight = true;
         }
       } else if (enemy.type === 'ghost_double') {
+        // Ghost double decays over time
+        enemy.lifeTimer -= dt;
+        if (enemy.lifeTimer <= 0) {
+          enemy.defeated = true;
+          enemy.defeatedTimer = 0.35;
+          continue;
+        }
+
+        // If player has outrun the ghost by > 260 units (~16 tiles), the ghost dissolves
+        if (playerX !== undefined && (playerX - enemy.x > 260)) {
+          enemy.defeated = true;
+          enemy.defeatedTimer = 0.25;
+          continue;
+        }
+
         // Ghost double pulls from 2 seconds ago in player position history
         if (this.historyCount >= 100) {
           const pastIdx = (this.historyIndex - 100 + 120) % 120;
@@ -101,12 +147,14 @@ export class EnemyManager {
     py: number,
     pw: number,
     ph: number,
-    invulnerable: boolean
-  ): CauseId | null {
-    if (invulnerable) return null;
+    pvy: number = 0,
+    invulnerable: boolean = false
+  ): EnemyCollisionResult {
+    if (invulnerable) return { cause: null, stomped: false };
 
-    for (const enemy of this.enemies) {
-      if (enemy.frozenTimer > 0) continue;
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const enemy = this.enemies[i];
+      if (enemy.frozenTimer > 0 || enemy.defeated) continue;
 
       if (
         px < enemy.x + enemy.width &&
@@ -114,9 +162,25 @@ export class EnemyManager {
         py < enemy.y + enemy.height &&
         py + ph > enemy.y
       ) {
-        return enemy.type === 'ghost_double' ? 'ghost_double' : 'rebel_extra';
+        // STOMP MECHANIC (Muro 2 solution):
+        // If player is descending (pvy > 40) and feet are on the upper portion of the enemy, stomp them!
+        const feetY = py + ph;
+        const enemyMidY = enemy.y + enemy.height * 0.55;
+
+        if (pvy > 40 && feetY <= enemyMidY + 6) {
+          enemy.defeated = true;
+          enemy.defeatedTimer = 0.35;
+          return { cause: null, stomped: true };
+        }
+
+        // Otherwise fatal collision
+        return {
+          cause: enemy.type === 'ghost_double' ? 'ghost_double' : 'rebel_extra',
+          stomped: false,
+        };
       }
     }
-    return null;
+
+    return { cause: null, stomped: false };
   }
 }

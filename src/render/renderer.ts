@@ -258,28 +258,35 @@ export class Renderer {
           }
         }
       } else if (trap.type === 'freeze_frame') {
-        // Freeze frame: theatrical spotlight and pause glyph
+        // Freeze frame: theatrical spotlight and pause barrier
         if (trap.isTelegraphing) {
-          ctx.fillStyle = 'rgba(66, 191, 194, 0.2)';
-          ctx.fillRect(trap.x, trap.y - 20, trap.width, trap.height + 20);
+          ctx.fillStyle = 'rgba(66, 191, 194, 0.25)';
+          ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
+          ctx.strokeStyle = '#42BFC2';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(trap.x, trap.y, trap.width, trap.height);
           ctx.fillStyle = '#42BFC2';
-          ctx.fillText('⏸ PAUSA', trap.x - 2, trap.y - 25);
+          ctx.font = '10px monospace';
+          ctx.fillText('⏸ PAUSA', trap.x - 2, trap.y - 6);
         } else if (trap.isHazardActive) {
           ctx.fillStyle = '#D94B43';
           ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
           ctx.fillStyle = '#E8DFC9';
-          ctx.fillRect(trap.x + 6, trap.y + 8, 4, 16);
-          ctx.fillRect(trap.x + 18, trap.y + 8, 4, 16);
+          ctx.fillRect(trap.x + 6, trap.y + 10, 5, 28);
+          ctx.fillRect(trap.x + 17, trap.y + 10, 5, 28);
         }
       } else if (trap.type === 'film_scratch') {
         // Vertical film scratch line
         if (trap.isTelegraphing) {
-          ctx.strokeStyle = 'rgba(232, 223, 201, 0.4)';
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'rgba(232, 223, 201, 0.6)';
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
           ctx.moveTo(trap.x + 7, trap.y);
           ctx.lineTo(trap.x + 7, trap.y + trap.height);
           ctx.stroke();
+          ctx.fillStyle = '#D69A45';
+          ctx.font = '9px monospace';
+          ctx.fillText('⚡ RISCO', trap.x - 6, trap.y - 6);
         } else if (trap.isHazardActive) {
           ctx.strokeStyle = '#D94B43';
           ctx.lineWidth = 3;
@@ -292,7 +299,15 @@ export class Renderer {
         }
       } else if (trap.type === 'rewind_glitch') {
         // Rewind glitch box
-        if (trap.isHazardActive) {
+        if (trap.isTelegraphing) {
+          ctx.strokeStyle = 'rgba(128, 104, 184, 0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.strokeRect(trap.x, trap.y, trap.width, trap.height);
+          ctx.fillStyle = '#8068B8';
+          ctx.font = '10px monospace';
+          ctx.fillText('<< GLITCH', trap.x - 4, trap.y - 4);
+        } else if (trap.isHazardActive) {
           ctx.fillStyle = 'rgba(128, 104, 184, 0.85)'; // Violet
           ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
           ctx.fillStyle = '#E8DFC9';
@@ -355,11 +370,29 @@ export class Renderer {
     for (const e of world.enemies.enemies) {
       if (e.x < this.camera.x - 30 || e.x > this.camera.x + LOGICAL_WIDTH + 30) continue;
 
+      ctx.save();
+      if (e.defeated) {
+        // Cut slash & dissolve fade upon stomp or expiration
+        ctx.globalAlpha = Math.max(0, e.defeatedTimer / 0.35);
+        ctx.strokeStyle = '#D94B43';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(e.x - 4, e.y + e.height / 2);
+        ctx.lineTo(e.x + e.width + 4, e.y + e.height / 2);
+        ctx.stroke();
+      } else if (e.type === 'ghost_double') {
+        // Flickering dissipation as ghost approaches lifetime expiration
+        if (e.lifeTimer < 1.8) {
+          ctx.globalAlpha = 0.35 + Math.sin(world.ticks * 0.4) * 0.25;
+        }
+      }
+
       if (e.type === 'rebel_extra') {
         rebel.draw(ctx, e.x, e.y, { facingRight: e.facingRight });
       } else {
         ghost.draw(ctx, e.x, e.y, { facingRight: e.facingRight });
       }
+      ctx.restore();
     }
   }
 

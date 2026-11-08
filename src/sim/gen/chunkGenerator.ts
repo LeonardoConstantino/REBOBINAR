@@ -2,6 +2,7 @@ import { hashSeed, mulberry32 } from '../prng';
 import { ChunkData, ChunkEnemySpawn, ChunkPowerupSpawn, ChunkTrapSpawn, DifficultyParams } from './types';
 import { ChunkValidator } from './chunkValidator';
 import { CHUNK_WIDTH_TILES, TILE_SIZE } from '../../content/tuning';
+import { TRAP_DEFS } from '../../content/trapsData';
 
 const HEIGHT_TILES = 23;
 const GROUND_Y = 18;
@@ -95,6 +96,8 @@ function buildRawChunk(
 
   // Platforms (film reels / studio trusses / scaffolding)
   const numPlatforms = Math.floor(1 + rng() * 3);
+  const platformSpans: Array<{ startX: number; endX: number }> = [];
+
   for (let i = 0; i < numPlatforms; i++) {
     const platWidth = 4 + Math.floor(rng() * 4);
     const platX = 2 + Math.floor(rng() * (CHUNK_WIDTH_TILES - platWidth - 4));
@@ -103,6 +106,8 @@ function buildRawChunk(
     for (let px = platX; px < platX + platWidth; px++) {
       tiles[platY * CHUNK_WIDTH_TILES + px] = 1;
     }
+
+    platformSpans.push({ startX: platX, endX: platX + platWidth });
 
     // Occasional powerup on platform (about 25% chance)
     if (rng() < 0.25 && powerups.length === 0) {
@@ -116,12 +121,32 @@ function buildRawChunk(
     }
   }
 
+  // Fair Level Design (Prevents Muro 3 pit trap):
+  // Guarantee solid ground for at least 3 tiles after a platform so players aren't launched into pits
+  for (const span of platformSpans) {
+    const landingEnd = Math.min(CHUNK_WIDTH_TILES - 1, span.endX + 3);
+    for (let lx = span.endX; lx <= landingEnd; lx++) {
+      for (let y = GROUND_Y; y < HEIGHT_TILES; y++) {
+        tiles[y * CHUNK_WIDTH_TILES + lx] = 1;
+      }
+    }
+  }
+
   // Spawn Traps (Erros de Edição) based on density and adapted trapMix
   const density = params.density * (1 + (params.adaptation.densityShift || 0));
   const trapBudget = Math.floor(1 + rng() * (1 + density * 1.5));
 
   for (let t = 0; t < trapBudget; t++) {
-    const trapX = 5 + Math.floor(rng() * (CHUNK_WIDTH_TILES - 10));
+    let trapX = 5 + Math.floor(rng() * (CHUNK_WIDTH_TILES - 10));
+
+    // Fair Level Design (Prevents Muro 1 trap right at platform exit):
+    // If trap rolls into landing zone, shift it forward into open ground
+    for (const span of platformSpans) {
+      if (trapX >= span.endX && trapX <= span.endX + 3) {
+        trapX = Math.min(CHUNK_WIDTH_TILES - 5, span.endX + 4);
+      }
+    }
+
     // Determine trap type via weights
     const roll = rng();
     const w = params.trapMix;
@@ -140,12 +165,24 @@ function buildRawChunk(
       trapType = 'rewind_glitch';
     }
 
-    // Position traps on solid ground or over gaps
-    const groundY = GROUND_Y;
+    // Position traps so their bottom edge rests solidly ON the floor surface (GROUND_Y * TILE_SIZE)
+    const floorPixelY = GROUND_Y * TILE_SIZE; // 288
+    const def = TRAP_DEFS[trapType];
+    const topPixelY = floorPixelY - def.height;
+    const tileY = topPixelY / TILE_SIZE;
+
+    // Guarantee that the ground beneath the trap is solid (no traps floating over pits)
+    const trapWidthTiles = Math.ceil(def.width / TILE_SIZE);
+    for (let tx = trapX; tx <= Math.min(CHUNK_WIDTH_TILES - 1, trapX + trapWidthTiles); tx++) {
+      for (let y = GROUND_Y; y < HEIGHT_TILES; y++) {
+        tiles[y * CHUNK_WIDTH_TILES + tx] = 1;
+      }
+    }
+
     traps.push({
       type: trapType,
       tileX: trapX,
-      tileY: trapType === 'film_scratch' ? groundY - 4 : groundY,
+      tileY,
       phaseOffset: rng() * 2.0,
     });
   }

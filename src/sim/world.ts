@@ -230,7 +230,7 @@ export class World {
 
     // Update enemies & traps
     this.enemies.recordPlayerPosition(this.player.x, this.player.y);
-    this.enemies.update(scaledDt);
+    this.enemies.update(scaledDt, this.player.x);
     this.traps.update(scaledDt, Math.abs(this.player.vx), this.player.dashing);
 
     // Update Final Cut pressure
@@ -422,8 +422,9 @@ export class World {
         }
       }
 
-      // Relieve pressure
+      // Relieve pressure & dispel any pursuing ghost doubles
       this.finalCut.relieveOnKeyframe();
+      this.enemies.dispelAllGhosts();
 
       eventBus.emit('keyframe:crossed', { split });
     }
@@ -446,15 +447,25 @@ export class World {
     }
 
     // Check Enemies
-    const enemyCause = this.enemies.checkCollision(
+    const enemyResult = this.enemies.checkCollision(
       this.player.x,
       this.player.y,
       this.player.width,
       this.player.height,
+      this.player.vy,
       false
     );
-    if (enemyCause) {
-      this.killPlayer(enemyCause);
+
+    if (enemyResult.stomped) {
+      // Bop jump: player stomped on top of the enemy
+      this.player.vy = -380;
+      eventBus.emit('player:stomp', { x: this.player.x, y: this.player.y });
+      eventBus.emit('camera:shake', { intensity: 3.5, durationSeconds: 0.12 });
+      return;
+    }
+
+    if (enemyResult.cause) {
+      this.killPlayer(enemyResult.cause);
     }
   }
 
@@ -510,6 +521,7 @@ export class World {
     this.player.activePowerupTimer = snapshot.activePowerupTimer;
     this.distanceUnits = snapshot.distanceUnits;
     this.finalCut.setPressure(snapshot.pressure);
+    this.enemies.dispelAllGhosts();
 
     eventBus.emit('player:retake', {
       x: this.player.x,
@@ -526,6 +538,7 @@ export class World {
     this.rewindProgress = 0;
     this.rewindDurationSeconds = modeCfg.rewindDurationMs / 1000;
     this.rewindSampleIndex = Math.max(0, this.trail.count - 1);
+    this.enemies.dispelAllGhosts();
 
     eventBus.emit('rewind:started', {
       durationMs: modeCfg.rewindDurationMs,
