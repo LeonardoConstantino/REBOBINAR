@@ -111,7 +111,7 @@ export const VirtualPad: React.FC = () => {
   const isLeft = !leftHandedPad;
 
   return (
-    <div className="absolute inset-0 pointer-events-none flex justify-between items-end p-4 pb-6 select-none z-10">
+    <div className="absolute inset-0 pointer-events-none flex justify-between items-end p-4 pb-[max(1.5rem,env(safe-area-inset-bottom,24px))] px-[max(1rem,env(safe-area-inset-right,16px))] select-none z-10">
       {/* 1. Dynamic Slide Zone (Left by default, Right if left-handed) */}
       <div
         className={`pointer-events-auto flex flex-col items-center justify-end ${
@@ -149,9 +149,9 @@ export const VirtualPad: React.FC = () => {
       {/* 2. Middle 60% Clear Area: Guaranteed unobstructed gameplay viewing */}
       <div className="order-2 flex-1 pointer-events-none" />
 
-      {/* 3. Action Buttons Ergonomic Arc */}
+      {/* 3. Action Buttons Ergonomic Arc (Zero-Overlap Guaranteed Geometry) */}
       <div
-        className={`pointer-events-auto relative w-48 h-36 flex items-end justify-end ${
+        className={`pointer-events-auto relative w-48 h-48 select-none ${
           isLeft ? 'order-3' : 'order-1'
         }`}
         style={{
@@ -159,22 +159,32 @@ export const VirtualPad: React.FC = () => {
           transformOrigin: isLeft ? 'bottom right' : 'bottom left',
         }}
       >
-        {/* Retake Button (Outer arc, deliberate reach) */}
+        {/* Retake Button (Upper-Left deliberate position) */}
         {modeConfig.hasRetake && (
           <button
             onPointerDown={(e) => handleButtonDown(e, Btn.Retake, 'retake')}
             onPointerUp={(e) => handleButtonUp(e, 'retake')}
             onPointerCancel={(e) => handleButtonUp(e, 'retake')}
             disabled={retakeCharges <= 0}
-            className={`absolute top-0 left-2 w-11 h-11 rounded-full border flex flex-col items-center justify-center transition-all ${
+            style={{
+              bottom: '116px',
+              [isLeft ? 'right' : 'left']: '84px',
+            }}
+            className={`absolute w-11 h-11 rounded-full border flex flex-col items-center justify-center transition-all cursor-pointer ${
               activeButtons['retake']
-                ? 'bg-[#D69A45] border-white scale-95 shadow-md'
+                ? 'bg-[#D69A45] text-[#17191D] border-white scale-95 shadow-md'
                 : retakeCharges > 0
-                ? 'bg-[#17191D]/40 border-[#D69A45]/60 text-[#D69A45] opacity-50'
-                : 'bg-black/20 border-white/10 text-white/20 opacity-20'
+                ? 'bg-[#17191D]/40 border-[#D69A45]/60 text-[#D69A45] opacity-60 hover:opacity-90'
+                : 'bg-black/20 border-white/10 text-white/20 opacity-20 cursor-not-allowed'
             }`}
+            title="Retomada / Rebobinar"
           >
-            <span className="font-mono-film text-[9px] font-bold">« RET</span>
+            <span className="font-mono-film text-[9px] font-bold leading-none">« RET</span>
+            {retakeCharges > 0 && (
+              <span className="font-mono-film text-[7px] text-[#D69A45] opacity-80 mt-0.5">
+                ×{retakeCharges}
+              </span>
+            )}
           </button>
         )}
 
@@ -183,27 +193,45 @@ export const VirtualPad: React.FC = () => {
           onPointerDown={(e) => handleButtonDown(e, Btn.Item, 'item')}
           onPointerUp={(e) => handleButtonUp(e, 'item')}
           onPointerCancel={(e) => handleButtonUp(e, 'item')}
-          className={`absolute top-4 right-16 w-12 h-12 rounded-full border flex flex-col items-center justify-center transition-all ${
+          style={{
+            bottom: '46px',
+            [isLeft ? 'right' : 'left']: '76px',
+          }}
+          className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center transition-all cursor-pointer ${
             activeButtons['item']
-              ? 'bg-[#42BFC2] border-white scale-95 shadow-md'
+              ? 'bg-[#42BFC2] text-[#17191D] border-white scale-95 shadow-md'
               : storedPowerup
-              ? 'bg-[#17191D]/60 border-[#42BFC2]/80 text-[#42BFC2] opacity-75'
+              ? 'bg-[#17191D]/60 border-[#42BFC2]/80 text-[#42BFC2] opacity-80 shadow-[0_0_8px_rgba(66,191,194,0.3)]'
               : 'bg-[#17191D]/30 border-[#E8DFC9]/20 text-[#E8DFC9]/40 opacity-30'
           }`}
+          title="Usar Item"
         >
-          <span className="font-mono-film text-[10px] font-bold">ITEM</span>
+          <span className="font-mono-film text-[9px] font-bold leading-tight">
+            {storedPowerup === 'golden_tape'
+              ? 'FITA'
+              : storedPowerup === 'slow_cam'
+              ? 'SLOW'
+              : storedPowerup === 'still_frame'
+              ? 'PAUSA'
+              : 'ITEM'}
+          </span>
         </button>
 
-        {/* Dash Button */}
+        {/* Dash Button (Above Jump with 10px clear vertical gap) */}
         <button
           onPointerDown={(e) => handleButtonDown(e, Btn.Dash, 'dash')}
           onPointerUp={(e) => handleButtonUp(e, 'dash')}
           onPointerCancel={(e) => handleButtonUp(e, 'dash')}
-          className={`absolute bottom-14 right-2 w-13 h-13 rounded-full border flex flex-col items-center justify-center transition-all ${
+          style={{
+            bottom: '78px',
+            [isLeft ? 'right' : 'left']: '10px',
+          }}
+          className={`absolute w-13 h-13 rounded-full border flex flex-col items-center justify-center transition-all cursor-pointer ${
             activeButtons['dash']
-              ? 'bg-[#D94B43] border-white scale-95 shadow-md'
-              : 'bg-[#17191D]/35 border-[#E8DFC9]/30 text-[#E8DFC9] opacity-40 hover:opacity-75'
+              ? 'bg-[#D94B43] text-white border-white scale-95 shadow-md'
+              : 'bg-[#17191D]/35 border-[#E8DFC9]/30 text-[#E8DFC9] opacity-45 hover:opacity-75'
           }`}
+          title="Dash"
         >
           <span className="font-mono-film text-[10px] font-bold">DASH</span>
         </button>
@@ -213,14 +241,19 @@ export const VirtualPad: React.FC = () => {
           onPointerDown={(e) => handleButtonDown(e, Btn.Jump, 'jump')}
           onPointerUp={(e) => handleButtonUp(e, 'jump')}
           onPointerCancel={(e) => handleButtonUp(e, 'jump')}
-          className={`w-18 h-18 rounded-full border-2 flex flex-col items-center justify-center transition-all ${
+          style={{
+            bottom: '4px',
+            [isLeft ? 'right' : 'left']: '4px',
+          }}
+          className={`absolute w-16 h-16 rounded-full border-2 flex flex-col items-center justify-center transition-all cursor-pointer ${
             activeButtons['jump']
               ? 'bg-[#E8DFC9] text-[#17191D] border-white scale-95 shadow-xl'
-              : 'bg-[#17191D]/45 border-[#E8DFC9]/50 text-[#E8DFC9] opacity-60 hover:opacity-90'
+              : 'bg-[#17191D]/45 border-[#E8DFC9]/50 text-[#E8DFC9] opacity-65 hover:opacity-90'
           }`}
+          title="Pular"
         >
-          <span className="font-display text-xl tracking-wider font-bold">PULO</span>
-          <span className="text-[8px] font-mono-film opacity-75">ESPAÇO</span>
+          <span className="font-display text-lg tracking-wider font-bold leading-none">PULO</span>
+          <span className="text-[8px] font-mono-film opacity-75 mt-0.5">ESPAÇO</span>
         </button>
       </div>
     </div>
